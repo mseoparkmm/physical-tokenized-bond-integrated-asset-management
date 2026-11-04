@@ -46,7 +46,7 @@ h1{margin:0;font-size:26px;letter-spacing:-.02em}
 .year.active{background:var(--accent-soft);color:var(--accent);border-color:#b9ccec;font-weight:700}
 .year.terminal{border-style:dashed}
 .year.has-action::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin:4px auto 0}
-.layout{display:grid;grid-template-columns:330px 1fr;gap:16px}
+.layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px}
 .decision-panel{align-self:start;position:sticky;top:12px}
 .panel-h{padding:14px 16px 10px;border-bottom:1px solid #eef1f5}
 .panel-h h2{margin:0;font-size:15px}
@@ -79,7 +79,7 @@ h1{margin:0;font-size:26px;letter-spacing:-.02em}
 .message.error{color:var(--danger);font-weight:600}
 .message.success{color:#246a32}
 .message.warning{color:#8a5b00}
-.charts{display:grid;gap:16px;min-width:0}
+.charts{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0}
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .kpis{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
 .compact-kpis{gap:8px}
@@ -88,12 +88,22 @@ h1{margin:0;font-size:26px;letter-spacing:-.02em}
 .kpi .n{font-size:16px;font-weight:750}
 .kpi .t{font-size:11px;color:var(--muted);margin-top:2px}
 svg.chart,svg[id$="Chart"]{width:100%;height:260px;display:block;background:#fff;overflow:visible}
+#trafficRevenueChart{height:348px}
+.annual-chart-scroll{width:100%;overflow-x:auto;overflow-y:hidden}
+.annual-bar{cursor:pointer;transition:y .22s cubic-bezier(.2,.65,.15,1),height .22s cubic-bezier(.2,.65,.15,1),opacity .18s ease}
+.annual-bar[data-status="future"]{pointer-events:none;opacity:0}
+@media(prefers-reduced-motion:reduce){.annual-bar{transition:none}}
+.annual-bar:hover,.annual-bar:focus{opacity:.72;outline:none}
+.annual-legend-swatch{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.annual-legend-swatch.base{background:#dbe5f0}
+.annual-legend-swatch.scenario{background:#335f9c}
+@media(max-width:650px){#trafficRevenueChart{width:750px;min-width:750px;max-width:none}}
 .axis{stroke:#cfd6df;stroke-width:1}
 .grid{stroke:#eef1f5;stroke-width:1}
 .axis-label{font-size:9.5px;fill:#7b8490}
 .axis-title{font-size:10px;fill:#58616d;font-weight:600}
-.chart-line{fill:none;stroke-width:2.7;vector-effect:non-scaling-stroke}
-.chart-point{stroke:#fff;stroke-width:1.5;cursor:pointer}
+.chart-line{fill:none;stroke-width:2.15;vector-effect:non-scaling-stroke}
+.chart-point{stroke:#fff;stroke-width:.7;cursor:pointer}
 .selected-marker{stroke:#aeb7c4;stroke-width:1;stroke-dasharray:4 4}
 .threshold-line{stroke:var(--danger);stroke-width:1.3;stroke-dasharray:6 5;vector-effect:non-scaling-stroke}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:4px}
@@ -125,9 +135,9 @@ summary{cursor:pointer;font-size:12px;font-weight:700}
 .assumptions-grid strong{display:block;color:var(--ink);font-size:11px;margin-bottom:2px}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 @media (max-width:1100px){
-  .layout{grid-template-columns:1fr}
+  .layout{grid-template-columns:minmax(0,1fr)}
   .decision-panel{position:static}
-  .chart-grid{grid-template-columns:1fr}
+  .chart-grid{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:800px){
   .wrap{padding:12px}
@@ -142,6 +152,130 @@ summary{cursor:pointer;font-size:12px;font-weight:700}
 .rules-table th{background:#f7f9fb;color:#475467;font-weight:700}
 .rules-table td{color:#59636f}
 
+
+/* Sepolia single-bond ERC-20 interface (self-contained; no CDN). */
+.single-chain{border:1px solid #d2ddf0;background:#f7faff;border-radius:10px;padding:12px;margin-bottom:18px}
+.single-chain .label{font-size:12px;color:#234875}
+.chain-help{font-size:11px;color:#58677d;line-height:1.55;margin:7px 0;overflow-wrap:anywhere}
+.chain-actions{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}
+.chain-actions button{flex:1;min-width:120px;padding:8px 9px;border-radius:8px;border:1px solid #c6d4e8;background:white;color:#204a83;cursor:pointer;font-weight:650;font-size:12px}
+.chain-actions button:disabled,.chain-address-row button:disabled{opacity:.5;cursor:not-allowed}
+.chain-address-row{display:flex;gap:6px}
+.chain-address-row input{flex:1;min-width:0}
+.chain-address-row button{white-space:nowrap;border-radius:7px;padding:8px 10px;background:#edf3fd;border:1px solid #b6c8e3;color:#285486;cursor:pointer;font-size:12px}
+.chain-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.chain-metric{border:1px solid #e0e7f3;background:white;border-radius:7px;padding:7px 8px;min-width:0}
+.chain-metric span{display:block;color:#69788f;font-size:10px;margin-bottom:4px}
+.chain-metric strong{display:block;overflow-wrap:anywhere;font-size:11px}
+.chain-link{color:#24579d;display:inline-block;font-size:11px;margin-top:9px;overflow-wrap:anywhere}
+#singleMobileLink[hidden],#singleContractLink[hidden]{display:none!important}
+.chain-notice{color:#536477;font-size:11px;line-height:1.5;margin-top:9px;min-height:18px;overflow-wrap:anywhere}
+.chain-notice.error{color:#b42318}.chain-notice.success{color:#246a32}.chain-notice.warning{color:#936000}
+.chain-button{width:100%;background:#2f5fa7;color:white;border:0;border-radius:9px;padding:11px 12px;margin-top:10px;font-weight:700;cursor:pointer}
+.chain-button:disabled{opacity:.55;cursor:not-allowed}
+.chain-ledger{margin-top:10px;overflow-x:auto}
+.chain-ledger table{width:100%;border-collapse:collapse;font-size:11px;min-width:530px}
+.chain-ledger th,.chain-ledger td{padding:8px 9px;text-align:left;border-bottom:1px solid #e7ebf0}
+.chain-ledger th{background:#f6f8fb;color:#505e74}
+.chain-ledger a{color:#2f5fa7}
+.chain-note{font-size:11px;color:#667085;line-height:1.6;margin-top:10px}
+
+/* Timeline playback: presentation layer only; no chain writes or model changes. */
+.playback-shell{padding:13px 14px 12px;border-radius:11px;background:#f8fafd;border:1px solid #dee7f3;margin-bottom:12px}
+.playback-top{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between}
+.playback-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.playback-btn{border:1px solid #c9d5e5;background:#fff;color:#25456b;border-radius:8px;padding:8px 11px;font-size:12px;font-weight:650;cursor:pointer;min-height:36px}
+.playback-btn:hover:not(:disabled){background:#ebf2fd;border-color:#9fb9da}
+.playback-btn:disabled{opacity:.45;cursor:not-allowed}
+.playback-btn.playback-primary{min-width:110px;color:white;border-color:#24538b;background:#2f5fa7}
+.playback-btn.playback-primary:hover:not(:disabled){background:#254e88}
+.playback-btn.playback-primary[aria-pressed="true"]{background:#7c4a20;border-color:#71451f}
+.playback-speed{display:flex;align-items:center;gap:7px;font-size:11px;color:#596b81}
+.playback-speed select{width:auto;min-width:83px;padding:7px 27px 7px 9px;height:36px;font-size:12px}
+.playback-year{display:flex;align-items:baseline;gap:6px;margin-left:auto;font-variant-numeric:tabular-nums}
+.playback-year strong{font-size:26px;line-height:1;color:#285489;font-weight:800}
+.playback-year span{color:#8291a3;font-size:12px}
+.playback-scrub-row{margin:9px 0 8px}
+#playbackScrub{width:100%;height:7px;border-radius:5px;cursor:pointer;appearance:none;-webkit-appearance:none;background:linear-gradient(to right,#2f5fa7 0%,#2f5fa7 var(--playback-progress,0%),#dbe4ef var(--playback-progress,0%),#dbe4ef 100%);outline-offset:6px}
+#playbackScrub::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#2f5fa7;border:3px solid white;box-shadow:0 0 0 1px #7ca1ce;cursor:pointer}
+#playbackScrub::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:#2f5fa7;border:3px solid #fff;box-shadow:0 0 0 1px #7ca1ce;cursor:pointer}
+.playback-scrub-labels{display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:#738095}
+.playback-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:9px}
+.playback-stat{padding:9px 10px;border:1px solid #e0e6ef;background:#fff;border-radius:9px;min-width:0}
+.playback-stat-top{display:flex;gap:5px;align-items:center;justify-content:space-between;font-size:11px;color:#34465b;margin-bottom:6px}
+.playback-stat-top strong{font-size:11px}
+.playback-map{font-size:11px;color:#596d82;font-variant-numeric:tabular-nums}
+.playback-dist{display:flex;overflow:hidden;border-radius:4px;height:9px;background:#edf0f4;margin:7px 0;box-shadow:inset 0 0 0 1px #e0e4e9}
+.playback-dist span{display:block;height:100%;width:0;transition:width .55s ease-in-out}
+.playback-dist .g{background:#5f9f68}.playback-dist .f{background:#e2b34a}.playback-dist .p{background:#cc5a5a}
+.playback-stat-foot{display:flex;justify-content:space-between;gap:5px;color:#65758a;font-size:10px;font-variant-numeric:tabular-nums}
+.playback-finance-big{font-size:20px;font-weight:750;color:#9b5b00;font-variant-numeric:tabular-nums;line-height:1.3}
+.playback-finance-big.fail{color:#b42318}
+.playback-finance-foot{color:#65758a;font-size:10.5px;margin-top:5px;font-variant-numeric:tabular-nums}
+.playback-narrative{font-size:11px;line-height:1.5;color:#48607d;margin-top:9px;min-height:16px}
+.playback-disclaimer{font-size:10.5px;line-height:1.5;color:#667085;margin-top:5px}
+.timeline.playing{border-color:#afc7e7}
+.timeline.playing #playbackYear{color:#2459a0}
+@media(max-width:950px){.playback-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.playback-year{margin-left:0}}
+@media(max-width:570px){.playback-top{align-items:flex-start}.playback-actions{width:100%}.playback-btn{flex:1}.playback-speed{flex:1}.playback-stats{grid-template-columns:1fr 1fr}.playback-stat{padding:8px}}
+@media(prefers-reduced-motion: reduce){.playback-dist span{transition:none}}
+
+/* Replay controls continue to drive both annual panels. */
+.playback-year strong{font-size:23px;white-space:nowrap}
+.playback-year{align-items:center}
+.playback-speed{flex-wrap:wrap}
+.playback-speed select{min-width:90px}
+@media(max-width:650px){.playback-year strong{font-size:20px}}
+
+/* Locked reference vs counterfactual scenario. Baseline never recalculates. */
+.comparison-banner{border:1px solid #dce4ee;background:#fff;border-radius:12px;padding:13px 17px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.comparison-banner-main{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.comparison-title{font-size:13px;font-weight:750;color:#25384f}
+.comparison-note{font-size:11px;color:#64748b;line-height:1.5;max-width:610px}
+.compare-pills{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.compare-key{display:inline-flex;align-items:center;gap:6px;color:#54647b;font-size:11px;font-weight:650;white-space:nowrap}
+.compare-swatch{width:24px;height:0;border-top:4px solid #cbd5e1;border-radius:9px;display:inline-block}
+.compare-swatch.scenario{border-color:#335f9c}
+.compare-swatch.baseline{border-top-style:dashed;border-top-color:#d5dce7;opacity:.65}
+.comparison-status{font-size:11px;color:#42566d;background:#f1f5f9;border-radius:6px;padding:5px 9px;white-space:nowrap}
+.panel-time-note{font-size:11px;color:#617188;margin-top:7px;line-height:1.5}
+.kpi .baseline-value{margin-top:6px;font-size:10px;color:#8494a7;line-height:1.45;white-space:normal}
+.kpi .difference{color:#425f88;font-weight:750}
+.kpi .asof-note{display:block;font-size:10px;margin-top:4px;color:#465f7d;line-height:1.35}
+.graph-legend-sub{font-size:10px;color:#7a8b9e;margin-top:6px;line-height:1.5}
+.compare-bar-label{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:10px;color:#8090a3;margin-top:8px;margin-bottom:4px}
+.compare-bar-label.current{color:#344f72;font-weight:750}
+.probbar.muted{opacity:.32;height:12px;filter:saturate(.8)}
+.physical-compare-summary{display:flex;align-items:center;flex-wrap:wrap;gap:8px;color:#687b91;font-size:10px;margin-top:8px;line-height:1.45}
+.physical-compare-summary strong{color:#335b89}
+.phys-card.changed{border-color:#c6d7eb;box-shadow:0 0 0 1px rgba(46,95,167,.06)}
+.playback-dist.muted{height:7px;opacity:.33;margin:3px 0 7px}
+.playback-base-line{display:block;font-size:10px;color:#8999a9;margin:2px 0}
+.playback-finance-foot{line-height:1.5}
+.asof-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0 4px}
+.asof-item{background:#f7f9fc;border:1px solid #e5eaf1;border-radius:8px;padding:10px 12px;min-width:0}
+.asof-item label{display:block;font-size:10px;color:#738399;line-height:1.4}
+.asof-item strong{display:block;font-size:16px;color:#2d527f;margin:5px 0;font-variant-numeric:tabular-nums}
+.asof-item small{font-size:10px;color:#8995a7;display:block;line-height:1.45}
+.chart-progress-date{font-size:9.5px;fill:#536d8c;font-weight:700}
+@media(max-width:760px){.comparison-banner{align-items:flex-start}.asof-strip{grid-template-columns:1fr}.comparison-status{white-space:normal}}
+
+/* Calendar-date decisions with scheduled activation. */
+.scheduled-panel{margin:12px 0 4px;padding:11px;background:#f8fafc;border:1px solid #dce5f0;border-radius:9px}
+.scheduled-panel>strong{display:block;font-size:12px;color:#2f4968;margin-bottom:7px}
+.schedule-list{display:flex;flex-direction:column;gap:6px;max-height:210px;overflow-y:auto;font-size:11px;color:#54657a}
+.schedule-row{border-bottom:1px solid #e8eef4;padding-bottom:5px;line-height:1.55}
+.schedule-row:last-child{border-bottom:0}
+.schedule-row b{color:#304962;font-weight:700}
+.schedule-row .state{font-weight:750;color:#356185}
+.schedule-row .state.active{color:#2e7d32}
+.schedule-row .state.pending{color:#936000}
+#decisionTiming{line-height:1.55}
+/* A draft freezes the decision date, not simulation playback. */
+.decision-draft-lock{margin-top:7px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:10.5px;line-height:1.45;color:#684d21;background:#fff8e9;border:1px solid #eaddb9;border-radius:7px;padding:7px 9px}
+.decision-draft-lock[hidden]{display:none!important}
+.decision-draft-lock button{font:inherit;cursor:pointer;color:#23558a;background:white;border:1px solid #b7cade;border-radius:6px;padding:3px 8px;font-weight:700}
+.decision-draft-lock button:disabled{opacity:.5;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -154,10 +288,83 @@ summary{cursor:pointer;font-size:12px;font-weight:700}
     <div class="badge" id="modelBadge">Interactive model</div>
   </div>
 
+  <div class="comparison-banner" role="group" aria-label="Baseline versus decision scenario">
+    <div class="comparison-banner-main">
+      <span class="comparison-title">Baseline vs. Decision scenario</span>
+      <span class="comparison-note">Fixed reference: $25M/year mock issuance, no bridge intervention, no Sepolia token issuance. Actions change only the scenario.</span>
+    </div>
+    <div class="compare-pills">
+      <span class="compare-key"><span class="compare-swatch baseline"></span>Baseline · light</span>
+      <span class="compare-key"><span class="compare-swatch scenario"></span>Scenario · dark</span>
+      <span class="comparison-status" id="comparisonStatus">No scenario changes</span>
+    </div>
+  </div>
   <div class="timeline panel" id="timelinePanel">
     <div class="timeline-head">
       <span>Simulation year</span>
-      <span class="timeline-note">2010–2024: decisions · 2025: terminal state</span>
+      <span class="timeline-note">Historical replay · daily/weekly decisions · one-calendar-month activation · annual DSCR</span>
+    </div>
+    <div class="playback-shell" role="region" aria-label="Simulation timeline playback">
+      <div class="playback-top">
+        <div class="playback-actions">
+          <button type="button" class="playback-btn" id="playbackRestart" title="Return to the first simulation year">↺ 2010</button>
+          <button type="button" class="playback-btn" id="playbackPrev" title="Previous selected interval">← Step</button>
+          <button type="button" class="playback-btn playback-primary" id="playbackPlay" aria-pressed="false">▶ Play</button>
+          <button type="button" class="playback-btn" id="playbackNext" title="Next selected interval">Step →</button>
+        </div>
+        <div class="playback-speed">
+          <label for="playbackStep">Interval</label>
+          <select id="playbackStep" aria-label="Simulation playback interval">
+            <option value="1">Daily</option>
+            <option value="7" selected>Weekly (7 days)</option>
+          </select>
+          <label for="playbackSpeed">Speed</label>
+          <select id="playbackSpeed" aria-label="Playback speed">
+            <option value="0.5">0.5×</option>
+            <option value="1">1×</option>
+            <option value="2" selected>2×</option>
+            <option value="4">4×</option>
+            <option value="8">8×</option>
+          </select>
+        </div>
+        <div class="playback-year"><strong id="playbackYear">2010-01-01</strong><span>simulation date (UTC)</span></div>
+      </div>
+      <div class="playback-scrub-row">
+        <label class="sr-only" for="playbackScrub">Go to simulation date</label>
+        <input id="playbackScrub" type="range" min="0" max="5843" step="1" value="0" />
+        <div class="playback-scrub-labels"><span>2010</span><span>2025</span></div>
+      </div>
+      <div class="playback-stats" aria-label="Live physical condition and financial summary">
+        <div class="playback-stat" data-play-component="deck">
+          <div class="playback-stat-top"><strong>Deck</strong><span class="playback-map" id="playbackDeckMap">MAP 5</span></div>
+          <div class="playback-base-line" id="playbackDeckBase">Baseline Poor —</div>
+          <div class="playback-dist muted" data-play-base="deck" title="Baseline Good / Fair / Poor"><span class="g"></span><span class="f"></span><span class="p"></span></div>
+          <div class="playback-dist" title="Scenario Good / Fair / Poor"><span class="g"></span><span class="f"></span><span class="p"></span></div>
+          <div class="playback-stat-foot"><span id="playbackDeckState">Fair</span><span id="playbackDeckPoor">Poor 0.0%</span></div>
+        </div>
+        <div class="playback-stat" data-play-component="super">
+          <div class="playback-stat-top"><strong>Superstructure</strong><span class="playback-map" id="playbackSuperMap">MAP 5</span></div>
+          <div class="playback-base-line" id="playbackSuperBase">Baseline Poor —</div>
+          <div class="playback-dist muted" data-play-base="super" title="Baseline Good / Fair / Poor"><span class="g"></span><span class="f"></span><span class="p"></span></div>
+          <div class="playback-dist" title="Scenario Good / Fair / Poor"><span class="g"></span><span class="f"></span><span class="p"></span></div>
+          <div class="playback-stat-foot"><span id="playbackSuperState">Fair</span><span id="playbackSuperPoor">Poor 0.0%</span></div>
+        </div>
+        <div class="playback-stat" data-play-component="sub">
+          <div class="playback-stat-top"><strong>Substructure</strong><span class="playback-map" id="playbackSubMap">MAP 5</span></div>
+          <div class="playback-base-line" id="playbackSubBase">Baseline Poor —</div>
+          <div class="playback-dist muted" data-play-base="sub" title="Baseline Good / Fair / Poor"><span class="g"></span><span class="f"></span><span class="p"></span></div>
+          <div class="playback-dist" title="Scenario Good / Fair / Poor"><span class="g"></span><span class="f"></span><span class="p"></span></div>
+          <div class="playback-stat-foot"><span id="playbackSubState">Fair</span><span id="playbackSubPoor">Poor 0.0%</span></div>
+        </div>
+        <div class="playback-stat" aria-label="Annual financial position">
+          <div class="playback-stat-top"><strong>Financial status</strong><span class="playback-map">DSCR</span></div>
+          <div class="playback-finance-big" id="playbackDscr">—</div>
+          <div class="playback-base-line" id="playbackFinanceBase">Baseline annual DSCR —</div>
+          <div class="playback-finance-foot" id="playbackCash">Cash — · Debt —</div>
+        </div>
+      </div>
+      <div class="playback-narrative" id="playbackNarrative" aria-live="off"></div>
+      <div class="playback-disclaimer" id="playbackHint" aria-live="polite">Decisions are made on the current replay date and activate one calendar month later. Play never issues tokens.</div>
     </div>
     <div class="years" id="years"></div>
   </div>
@@ -166,19 +373,45 @@ summary{cursor:pointer;font-size:12px;font-weight:700}
     <aside class="panel decision-panel">
       <div class="panel-h">
         <h2>Decision panel</h2>
-        <p>Selected year: <strong id="selectedYear">2024</strong></p>
-        <p id="decisionTiming">Decision executes on Jan 1 of the next year.</p>
+        <p>Decision date: <strong id="selectedDate">2010-01-01</strong> <span style="display:none" id="selectedYear">2010</span></p>
+        <p id="decisionTiming">Decision now · financial and physical effects begin one calendar month later.</p>
+        <div id="decisionDraftLock" class="decision-draft-lock" hidden>
+          <span id="decisionDraftLockText">Draft date held.</span>
+          <button type="button" id="decisionUseLiveDate" title="Discard the draft date and use the current playback date">Use live date</button>
+        </div>
       </div>
       <div class="panel-b">
-        <div class="decision-section">
-          <div class="label">1. Bond issuance</div>
-          <div class="choice-row" role="group" aria-label="Bond issuance">
-            <button type="button" class="choice active" id="bondYes">Issue</button>
-            <button type="button" class="choice" id="bondNo">Do not issue</button>
+
+        <div class="single-chain" id="singleBondSetup">
+          <div class="label">Sepolia · Single ERC-20 bond</div>
+          <div class="chain-help">Deploy <code>BridgeBondToken.sol</code> once, then register that ONE contract address. No Factory or Series. One BRB = $1 hypothetical face value.</div>
+          <div class="chain-actions">
+            <button type="button" id="singleConnect">Connect MetaMask</button>
+            <button type="button" id="singleSwitch">Use Sepolia</button>
           </div>
-          <label class="sr-only" for="bondAmount">Bond amount in million dollars</label>
-          <input class="input" id="bondAmount" type="number" value="25" min="0" step="1" />
-          <div class="mini-note">Amount ($M). The selected-year decision changes cash starting next year.</div>
+          <a id="singleMobileLink" class="chain-link" hidden target="_blank" rel="noopener noreferrer">Open in MetaMask app</a>
+          <div class="chain-help" id="singleWallet">Wallet: not connected</div>
+          <label class="sr-only" for="singleContractInput">BridgeBondToken contract address</label>
+          <div class="chain-address-row">
+            <input class="input" type="text" id="singleContractInput" placeholder="0x... token contract address" maxlength="42" autocomplete="off" spellcheck="false" />
+            <button type="button" id="singleLoad">Load bond</button>
+          </div>
+          <div class="chain-metrics">
+            <div class="chain-metric"><span>Coupon</span><strong id="singleCoupon">—</strong></div>
+            <div class="chain-metric"><span>Maturity (UTC)</span><strong id="singleMaturity">—</strong></div>
+            <div class="chain-metric"><span>Total issued / supply</span><strong id="singleSupply">—</strong></div>
+            <div class="chain-metric"><span>Owner</span><strong id="singleOwner">—</strong></div>
+          </div>
+          <a id="singleContractLink" class="chain-link" hidden target="_blank" rel="noopener noreferrer">View ERC-20 contract on Sepolia Etherscan</a>
+          <div class="chain-notice" id="singleNotice" aria-live="polite">Connect MetaMask and load a deployed BridgeBondToken contract.</div>
+        </div>
+        <div class="decision-section">
+          <div class="label">1. Bond issuance — actual Sepolia ERC-20 transaction</div>
+          <label class="token-input-label" for="bondAmount" style="font-size:11px;color:#59677c">New on-chain principal ($ million)</label>
+          <input class="input" id="bondAmount" type="number" value="25" min="0.000001" step="any" />
+          <button type="button" id="bondYes" class="chain-button">Issue ERC-20 bond + update DSCR</button>
+          <div class="mini-note">Issue mints ERC-20 tokens on Sepolia NOW. The research model schedules cash, debt and DSCR effects exactly one calendar month after the simulation decision date. This is hypothetical at-par funding; no dollars are transferred. Existing annual mock issuance is unchanged.</div>
+          <button type="button" class="secondary" id="bondNo" style="padding:7px 9px;font-size:11px">Override the legacy next-January mock issuance to $0</button>
         </div>
 
         <div class="decision-section">
@@ -213,8 +446,12 @@ summary{cursor:pointer;font-size:12px;font-weight:700}
           <div class="check" id="dscrCheck">DSCR ≥ 1.75<strong>PASS</strong></div>
         </div>
 
-        <button class="apply" type="button" id="applyBtn">Apply decision</button>
-        <button class="secondary" type="button" id="resetBtn">Reset to baseline</button>
+        <button class="apply" type="button" id="applyBtn">Schedule selected repairs · effective in 1 month</button>
+        <div class="scheduled-panel" id="decisionSchedule" aria-live="polite">
+          <strong>Decision schedule</strong>
+          <div class="schedule-list" id="scheduleList">No decisions scheduled.</div>
+        </div>
+        <button class="secondary" type="button" id="resetBtn">Reset simulated repair decisions (on-chain unchanged)</button>
         <div class="message" id="applyMsg" aria-live="polite"></div>
       </div>
     </aside>
@@ -222,65 +459,85 @@ summary{cursor:pointer;font-size:12px;font-weight:700}
     <main class="charts">
       <section class="panel">
         <div class="panel-h">
-          <h2>Traffic & Toll Revenue</h2>
-          <p>Actual/corrected Bronx-Whitestone Northbound 2-axle traffic is the baseline; intervention disruption reduces both traffic and revenue.</p>
+          <h2>Annual Traffic & Toll Revenue</h2>
+          <p>Historical playback: completed years show full annual totals; the active year grows with cumulative year-to-date values. After the one-month execution lag, construction traffic losses begin on the actual start date. Baseline remains fixed.</p>
         </div>
         <div class="panel-b">
           <div class="kpis">
-            <div class="kpi"><div class="n" id="trafficKpi">–</div><div class="t">Traffic, selected year</div></div>
-            <div class="kpi"><div class="n" id="grossKpi">–</div><div class="t">Gross toll revenue</div></div>
-            <div class="kpi"><div class="n" id="netKpi">–</div><div class="t">Net revenue after 30% Opex</div></div>
-            <div class="kpi"><div class="n" id="trafficLossKpi">–</div><div class="t">Traffic loss from construction</div></div>
+            <div class="kpi"><div class="n" id="trafficKpi">–</div><div class="t">Traffic · year to date</div></div>
+            <div class="kpi"><div class="n" id="grossKpi">–</div><div class="t">Gross toll revenue · YTD</div></div>
+            <div class="kpi"><div class="n" id="netKpi">–</div><div class="t">Net revenue after 30% Opex · YTD</div></div>
+            <div class="kpi"><div class="n" id="trafficLossKpi">–</div><div class="t">Construction traffic loss · YTD</div></div>
           </div>
-          <svg id="trafficRevenueChart" viewBox="0 0 900 270" preserveAspectRatio="none" aria-label="Traffic and toll revenue chart"></svg>
-          <div class="legend">
+          <div class="panel-time-note" id="annualTrafficTime">Year-end trajectories · date —</div>
+          <div class="annual-chart-scroll" role="region" aria-label="Scrollable annual bar chart"><svg id="trafficRevenueChart" viewBox="0 0 900 348" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Grouped annual bars, 2010 to 2025, showing baseline and decision scenario for traffic and toll revenue on separate scales"></svg></div>
+          <div class="legend" aria-label="Annual bar chart legend">
             <span><span class="dot traffic-dot"></span>Traffic (million vehicles)</span>
             <span><span class="dot revenue-dot"></span>Gross toll revenue ($M)</span>
+            <span><span class="annual-legend-swatch base"></span>Baseline · light bar</span>
+            <span><span class="annual-legend-swatch scenario"></span>Decision · dark bar</span>
           </div>
+          <div class="graph-legend-sub">Past years = full-year totals; highlighted year = YTD through the replay date; future years = not reached. Baseline is a fixed-decision reference, not a fixed display value. Scenario applies construction-related traffic losses only on active construction dates.</div>
         </div>
       </section>
 
       <section class="panel">
         <div class="panel-h">
-          <h2>Financial status</h2>
-          <p>Cash includes bond proceeds, net revenue, debt service, and intervention cost. DSCR excludes intervention cost.</p>
+          <h2>Annual financial status</h2>
+          <p>Playback gradually reveals completed annual results. Cash is an illustrative as-of balance for the active year; DSCR is that year's full-year projection, not a daily coverage ratio. Very light = Baseline; dark = Decision.</p>
         </div>
         <div class="panel-b">
           <div class="chart-grid">
             <div>
               <div class="kpis compact-kpis">
-                <div class="kpi"><div class="n" id="cashKpi">–</div><div class="t">End-of-year cash</div></div>
-                <div class="kpi"><div class="n" id="bondKpi">–</div><div class="t">Bond proceeds</div></div>
-                <div class="kpi"><div class="n" id="capexKpi">–</div><div class="t">Intervention cost</div></div>
+                <div class="kpi"><div class="n" id="cashKpi">–</div><div class="t">Cash · as of replay date</div></div>
+                <div class="kpi"><div class="n" id="bondKpi">–</div><div class="t">Bond proceeds · effective funding dates</div></div>
+                <div class="kpi"><div class="n" id="capexKpi">–</div><div class="t">Intervention cost incurred · YTD</div></div>
               </div>
-              <svg id="cashChart" viewBox="0 0 440 260" preserveAspectRatio="none" aria-label="Cash balance chart"></svg>
-              <div class="legend"><span><span class="dot cash-dot"></span>Cash balance ($M)</span></div>
+              <svg id="cashChart" viewBox="0 0 440 260" preserveAspectRatio="none" aria-label="Cash balance, baseline versus scenario"></svg>
+              <div class="legend"><span><span class="dot cash-dot"></span>Cash ($M)</span><span class="compare-key"><span class="compare-swatch baseline"></span>Baseline</span><span class="compare-key"><span class="compare-swatch scenario"></span>Scenario</span></div>
             </div>
 
             <div>
               <div class="kpis compact-kpis">
-                <div class="kpi"><div class="n" id="dscrKpi">–</div><div class="t">DSCR</div></div>
-                <div class="kpi"><div class="n" id="debtServiceKpi">–</div><div class="t">Debt service</div></div>
-                <div class="kpi"><div class="n" id="principalKpi">–</div><div class="t">Ending principal</div></div>
+                <div class="kpi"><div class="n" id="dscrKpi">–</div><div class="t">DSCR · annual projection</div></div>
+                <div class="kpi"><div class="n" id="debtServiceKpi">–</div><div class="t">Debt service · annual projection</div></div>
+                <div class="kpi"><div class="n" id="principalKpi">–</div><div class="t">Outstanding principal · as of</div></div>
               </div>
-              <svg id="dscrChart" viewBox="0 0 440 260" preserveAspectRatio="none" aria-label="DSCR chart"></svg>
+              <svg id="dscrChart" viewBox="0 0 440 260" preserveAspectRatio="none" aria-label="Annual DSCR, baseline versus scenario"></svg>
               <div class="legend">
                 <span><span class="dot dscr-dot"></span>DSCR</span>
                 <span><span class="dot threshold-dot"></span>Minimum 1.75×</span>
+                <span class="compare-key"><span class="compare-swatch baseline"></span>Baseline</span>
+                <span class="compare-key"><span class="compare-swatch scenario"></span>Scenario</span>
               </div>
             </div>
           </div>
+          <div class="asof-strip" aria-label="As-of illustrative finance versus annual coverage">
+            <div class="asof-item"><label>Cash through replay date · illustrative accrual</label><strong id="asofCash">—</strong><small id="asofCashBase">Baseline —</small></div>
+            <div class="asof-item"><label>Debt principal through replay date · modeled</label><strong id="asofDebt">—</strong><small id="asofDebtBase">Baseline —</small></div>
+            <div class="asof-item"><label>Annual DSCR · full-year forecast, not daily</label><strong id="asofDscr">—</strong><small id="asofDscrBase">Baseline —</small></div>
+          </div>
+          <div class="graph-legend-sub">Past years show year-end finance. Baseline mock bonds follow the existing January schedule; newly issued ERC-20 bonds enter cash and debt on the one-month-later model effective date. Interest accrues from that date, and construction expenditure follows actual construction days. Annual DSCR is a full-year projection and changes when scheduled financing or construction activates; it is not a daily coverage ratio.</div>
         </div>
       </section>
 
       <section class="panel">
         <div class="panel-h">
-          <h2>Physical state probabilities</h2>
-          <p>Exact NBI rating probabilities are preserved. MAP is the representative rating; tied probabilities use the lower rating.</p>
+          <h2>Physical state · Continuous-time probability bridge</h2>
+          <p>Light baseline and dark scenario CTMC probability paths, each anchored to their original 2-year Markov checkpoints. Maintenance can change the scenario trajectory; daily states are modeled, not new inspections.</p>
         </div>
         <div class="panel-b">
           <div class="physical-wrap" id="physicalCards"></div>
           <div class="footer-note" id="physicalFootnote"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-h"><h2>Confirmed Sepolia bond issuance</h2><p>On-chain ERC-20 issuance transactions, mapped to model decision years. Transaction addresses and the token contract are verifiable on Etherscan.</p></div>
+        <div class="panel-b">
+          <div class="chain-ledger"><table><thead><tr><th>Simulated decision → effective date</th><th>Principal</th><th>Coupon</th><th>Maturity</th><th>Sepolia transaction</th></tr></thead><tbody id="singleIssueRows"><tr><td colspan="5">No confirmed on-chain bond issuance.</td></tr></tbody></table></div>
+          <div class="chain-note">Dated issuance mappings are stored in this browser. Older year-only transactions default to the original next-January mapping; verify the displayed dates when switching devices. This is a research-only financial digital twin. The ERC-20 mint assumes the bonds were funded at par; no dollars or stablecoins are transferred or verified. Tokens do not provide legally enforceable claims. Coupon payments and principal redemption are calculated by the simulator, not executed on-chain. The historical mock issuance plan remains separate.</div>
         </div>
       </section>
 
@@ -290,10 +547,10 @@ summary{cursor:pointer;font-size:12px;font-weight:700}
           <div class="assumptions-grid">
             <div><strong>Traffic</strong><span id="trafficSourceNote"></span></div>
             <div><strong>Toll</strong><span id="tollAssumptionNote"></span></div>
-            <div><strong>Finance</strong><span>Initial cash $100M; 30% Opex; 10-year bullet bonds; opening legacy principal $250M; legacy coupon 3%.</span></div>
+            <div><strong>Finance</strong><span>Initial cash $100M; 30% Opex; baseline mock 10-year bullet bonds and $250M legacy debt; confirmed Sepolia BRB issue() mints are recognized one calendar month after the replay decision date at the fixed coupon and maturity, assuming hypothetical at-par funding. The on-chain mint itself happens when MetaMask confirms the transaction.</span></div>
             <div><strong>Borrowing</strong><span id="borrowingNote"></span></div>
-            <div><strong>Physical model</strong><span>BIN 5521217; 2010 Deck/Super/Sub = 5/5/5; local 2-year Markov matrices from the current Weissmann/TxDOT-based package.</span></div>
-            <div><strong>Interventions</strong><span>Decision in year t executes Jan 1 of t+1. Cost is spread evenly over duration. Traffic effects are annualized and combined multiplicatively.</span></div>
+            <div><strong>Physical model</strong><span>BIN 5521217; 2010 Deck/Super/Sub = 5/5/5; local 2-year Markov P is unchanged at every transition checkpoint. Intermediate daily/weekly states use a time-inhomogeneous CTMC probability-flow bridge constrained to those checkpoints; rates are assumption-dependent and not separately calibrated to daily inspection data.</span></div>
+            <div><strong>Interventions</strong><span>Decisions may be submitted on any replay day through Nov 2025. A scheduled action starts exactly one calendar month later (Jan 31 → Feb 28/29), with construction expense and daily traffic effects beginning on that date; physical state changes at construction completion. Existing baseline mock bonds retain their original next-January schedule.</span></div>
           </div>
           <div class="rules-table-wrap">
             <table class="rules-table">
@@ -608,8 +865,9 @@ const SimulatorCore = (() => {
     };
   }
 
-  function simulate(decisionsInput) {
+  function simulate(decisionsInput, confirmedChainIssues = []) {
     const decisions = clone(decisionsInput || createBaselineDecisions());
+    const chainIssues = Array.isArray(confirmedChainIssues) ? confirmedChainIssues : [];
     const physical = {};
     for (const comp of COMPONENTS) {
       physical[comp] = {
@@ -621,6 +879,7 @@ const SimulatorCore = (() => {
     }
 
     const portfolio = makeDebtPortfolio();
+    const executedInterventions = [];
     let cash = D.initialCash;
     const results = {};
     const warnings = [];
@@ -648,6 +907,27 @@ const SimulatorCore = (() => {
           legacy: false
         });
       }
+
+      // Independent single-token on-chain issues are incremental to the historical
+      // mock issue plan. Only confirmed BondIssued events may appear here.
+      let chainProceeds = 0;
+      for (const ev of chainIssues) {
+        if (Number(ev.modelYear) + 1 !== year) continue;
+        const amount = Number(ev.principalM);
+        const couponBps = Number(ev.couponBps);
+        const maturityYear = Number(ev.maturityYear);
+        if (!(Number.isFinite(amount) && amount > 0 &&
+              Number.isInteger(couponBps) && couponBps >= 0 && couponBps <= 10000 &&
+              Number.isInteger(maturityYear) && maturityYear > year)) continue;
+        chainProceeds += amount;
+        portfolio.push({
+          issueYear: year, maturityYear, principal: amount,
+          coupon: couponBps / 10000,
+          sourceDecisionYear: Number(ev.modelYear), legacy: false, onchain: true,
+          txHash: ev.txHash
+        });
+      }
+      bondProceeds += chainProceeds;
 
       const debt = debtMetrics(portfolio, year);
 
@@ -692,6 +972,7 @@ const SimulatorCore = (() => {
         const cashPass = fTent.cashEnd >= -EPS;
         if (dscrPass && cashPass) {
           executedNew = validProposed;
+          executedInterventions.push(...executedNew.map(x => ({...x})));
           for (const x of executedNew) {
             physical[x.component].construction = x;
             executionEvents.push({ component: x.component, choice: x.key, status: 'executed', reason: `Started Jan 1 ${year}; scheduled completion ${formatTime(x.endTime)}.` });
@@ -730,6 +1011,7 @@ const SimulatorCore = (() => {
         cashStart: cash,
         cashEnd: fin.cashEnd,
         bondProceeds,
+        chainProceeds,
         bondSourceDecisionYear,
         coupon: Number(D.couponByYear[String(year)]) || 0,
         moodyRating: D.moodyRatingByYear[String(year)] || '',
@@ -755,7 +1037,167 @@ const SimulatorCore = (() => {
       cash = fin.cashEnd;
     }
 
-    return { results, decisions, warnings, annualBaseline: ANNUAL_BASELINE };
+    return { results, decisions, warnings, annualBaseline: ANNUAL_BASELINE, executedInterventions };
+  }
+
+  // Date-resolution extensions. The original annual simulator remains the
+  // immutable reference when no dated actions/issuances are active.
+  const ONE_DAY_MS = 86400000;
+  const isoDateValid = date => /^\d{4}-\d{2}-\d{2}$/.test(String(date||'')) &&
+    new Date(String(date)+'T00:00:00.000Z').toISOString().slice(0,10) === date;
+  function addCalendarMonthISO(iso) {
+    if (!isoDateValid(iso)) throw Error('Invalid simulation decision date.');
+    const y=Number(iso.slice(0,4)),m=Number(iso.slice(5,7))-1,d=Number(iso.slice(8,10));
+    const last=new Date(Date.UTC(y,m+2,0)).getUTCDate();
+    return new Date(Date.UTC(y,m+1,Math.min(d,last))).toISOString().slice(0,10);
+  }
+  function addDaysISO(iso,days) {
+    return new Date(Date.parse(iso+'T00:00:00Z')+days*ONE_DAY_MS).toISOString().slice(0,10);
+  }
+  function isoYearFraction(iso) {
+    const ms=Date.parse(iso+'T00:00:00Z'), y=Number(iso.slice(0,4));
+    return y+(ms-Date.UTC(y,0,1))/(Date.UTC(y+1,0,1)-Date.UTC(y,0,1));
+  }
+  function makeDatedIntervention(component,decisionDate,currentMap) {
+    const rule=D.interventionRules[String(currentMap)];
+    if(!COMPONENTS.includes(component)||!rule||rule.key==='failure')return null;
+    const effectiveDate=addCalendarMonthISO(decisionDate);
+    const durationDays=Math.max(1,Math.round(rule.duration*365.2425));
+    const endDate=addDaysISO(effectiveDate,durationDays);
+    return {
+      id:`${component}:${decisionDate}:${rule.key}`,
+      component,componentLabel:COMPONENT_LABELS[component],
+      key:rule.key,label:rule.label,sourceDecisionYear:Number(decisionDate.slice(0,4)),
+      decisionDate,effectiveDate,startDate:effectiveDate,endDate,durationDays,
+      startTime:isoYearFraction(effectiveDate),endTime:isoYearFraction(endDate),
+      duration:rule.duration,target:rule.target,cost:rule.cost,
+      trafficImpact:rule.trafficImpact,basedOnRating:currentMap
+    };
+  }
+  function issueEffectiveDate(ev){
+    return isoDateValid(ev.modelDecisionDate) &&
+      Number(ev.modelDecisionDate.slice(0,4))===Number(ev.modelYear)
+      ? addCalendarMonthISO(ev.modelDecisionDate)
+      : `${Number(ev.modelYear)+1}-01-01`; // Legacy year-only Sepolia event.
+  }
+  function simulateDated(decisionsInput,confirmedChainIssues=[],datedActions=[]) {
+    const decisions=clone(decisionsInput||createBaselineDecisions());
+    const chainIssues=Array.isArray(confirmedChainIssues)?confirmedChainIssues:[];
+    const actions=Array.isArray(datedActions)?datedActions.slice():[];
+    if(!actions.length&&!chainIssues.some(e=>isoDateValid(e.modelDecisionDate))) {
+      return simulate(decisions,chainIssues);
+    }
+    actions.sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate)||a.component.localeCompare(b.component));
+    const components={};
+    const executedInterventions=actions.filter(x=>isoDateValid(x.effectiveDate) && isoDateValid(x.endDate));
+    const bridge=ContinuousPhysical.build({executedInterventions});
+    const portfolio=[];
+    const mockIssue=(year,principal,coupon,sourceDecisionYear,legacy=false)=>{
+      if(!(principal>0))return;
+      portfolio.push({issueDate:`${year}-01-01`,principal,coupon,
+        couponCutoffDate:`${year+D.maturityYears}-01-01`,
+        principalDueDate:`${year+D.maturityYears}-12-31`,
+        issueYear:year,maturityYear:year+D.maturityYears,sourceDecisionYear,legacy});
+    };
+    for(let yr=2000;yr<=2009;yr++)mockIssue(yr,D.legacyAnnualVintage,D.legacyCoupon,null,true);
+    for(const year of D.years){
+      const principal=year===2010?D.fixed2010Issue:
+        Math.max(0,Number(decisions[year-1]?.bondAmount)||0);
+      mockIssue(year,principal,Number(D.couponByYear[String(year)])||0,
+        year===2010?null:year-1,false);
+    }
+    for(const ev of chainIssues){
+      const principal=Number(ev.principalM),year=Number(ev.modelYear),
+        couponBps=Number(ev.couponBps),maturityYear=Number(ev.maturityYear);
+      if(!(principal>0&&Number.isInteger(year)&&year>=2010&&year<=2025&&
+        Number.isInteger(couponBps)&&couponBps>=0&&couponBps<=10000&&
+        Number.isInteger(maturityYear)))continue;
+      const issueDate=issueEffectiveDate(ev);
+      const mature=isoDateValid(ev.maturityDate)?ev.maturityDate:`${maturityYear}-12-31`;
+      if(issueDate>=mature)continue;
+      portfolio.push({issueDate,principal,coupon:couponBps/10000,
+        couponCutoffDate:mature,principalDueDate:mature,
+        issueYear:Number(issueDate.slice(0,4)),maturityYear,sourceDecisionYear:year,
+        onchain:true,txHash:ev.txHash});
+    }
+    const dailyTraffic=new Map(D.dailyTraffic);
+    const ledger={};
+    const results={},warnings=[];
+    let cash=D.initialCash;
+    for(const year of D.years){
+      const cashStart=cash, yearStart=`${year}-01-01`,yearEnd=`${year}-12-31`,
+        daysInYear=(Date.UTC(year+1,0,1)-Date.UTC(year,0,1))/ONE_DAY_MS;
+      let traffic=0,grossRevenue=0,interestDS=0,principalDS=0,bondProceeds=0,
+        chainProceeds=0,interventionCost=0, ytdTraffic=0,ytdGrossRevenue=0,
+        ytdNet=0,ytdCapex=0,ytdBond=0,endingPrincipal=0;
+      const actionDetails=new Map();
+      for(let idx=0;idx<daysInYear;idx++){
+        const date=addDaysISO(yearStart,idx);
+        let keep=1,capex=0;
+        for(const a of executedInterventions){
+          if(date<a.effectiveDate||date>=a.endDate)continue;
+          keep*=1-a.trafficImpact;
+          const todayCost=a.cost/a.durationDays;
+          capex+=todayCost;
+          const old=actionDetails.get(a.id)||{component:a.component,label:a.label,
+            sourceDecisionYear:a.sourceDecisionYear,sourceDecisionDate:a.decisionDate,
+            effectiveDate:a.effectiveDate,endDate:a.endDate,
+            overlap:0,trafficLoss:0,cost:0,endTime:a.endTime};
+          old.overlap+=1/daysInYear;
+          old.cost+=todayCost;
+          actionDetails.set(a.id,old);
+        }
+        const raw=Number(dailyTraffic.get(date))||0;
+        const trafficToday=raw*keep;
+        const grossToday=trafficToday*tollForDate(date)/1e6;
+        const netToday=grossToday*(1-D.opexShare);
+        let proceeds=0,chainToday=0,interestToday=0,principalToday=0;
+        for(const b of portfolio){
+          if(b.issueDate===date){proceeds+=b.principal;if(b.onchain)chainToday+=b.principal;}
+          if(date>=b.issueDate && date<b.couponCutoffDate){
+            interestToday+=b.principal*b.coupon/daysInYear;
+          }
+          if(b.principalDueDate===date)principalToday+=b.principal;
+        }
+        cash+=proceeds+netToday-interestToday-principalToday-capex;
+        traffic+=trafficToday;grossRevenue+=grossToday;
+        interestDS+=interestToday;principalDS+=principalToday;
+        bondProceeds+=proceeds;chainProceeds+=chainToday;
+        interventionCost+=capex;
+        ytdTraffic+=trafficToday;ytdGrossRevenue+=grossToday;
+        ytdNet+=netToday;ytdCapex+=capex;ytdBond+=proceeds;
+        endingPrincipal=portfolio.reduce((sum,b)=>sum+(b.issueDate<=date&&b.principalDueDate>date?b.principal:0),0);
+        ledger[date]={cash,principal:endingPrincipal,ytdTraffic,ytdGrossRevenue,ytdNet,
+          accruedCapex:ytdCapex,ytdBondProceeds:ytdBond,
+          ytdRevenue:ytdGrossRevenue,fraction:(idx+1)/daysInYear};
+      }
+      const base=ANNUAL_BASELINE[year];
+      const netRevenue=grossRevenue*(1-D.opexShare);
+      const debtService=interestDS+principalDS;
+      const dscr=debtService>EPS?netRevenue/debtService:null;
+      const componentsSnapshot={};
+      // UTC year end, immediately before January 1 of the following year.
+      const t=isoYearFraction(`${year+1}-01-01`)-1e-10;
+      for(const comp of COMPONENTS)componentsSnapshot[comp]=bridge.atTime(comp,t);
+      const financialFailure=cash<-EPS||(dscr!==null&&dscr<D.minDSCR-EPS);
+      if(financialFailure)warnings.push({year,type:'financial',text:`${year}: cash $${cash.toFixed(2)}M; DSCR ${dscr===null?'N/A':dscr.toFixed(2)+'x'}.`});
+      results[year]={year,cashStart,cashEnd:cash,bondProceeds,chainProceeds,
+        bondSourceDecisionYear:year===2010?null:year-1,
+        coupon:Number(D.couponByYear[String(year)])||0,
+        moodyRating:D.moodyRatingByYear[String(year)]||'',
+        interestDS,principalDS,debtService,endingPrincipal,
+        baselineTraffic:base.traffic,baselineGrossRevenue:base.grossRevenue,
+        traffic,trafficLoss:base.traffic>0?1-traffic/base.traffic:0,
+        grossRevenue,opex:grossRevenue*D.opexShare,netRevenue,
+        interventionCost,interventionDetail:Array.from(actionDetails.values()),
+        dscr,components:componentsSnapshot,
+        executionEvents:executedInterventions.filter(x=>x.effectiveDate.slice(0,4)===String(year))
+          .map(x=>({component:x.component,choice:x.key,status:'executed',decisionDate:x.decisionDate,
+            reason:`Decided ${x.decisionDate}; begins ${x.effectiveDate}; completes ${x.endDate}.`})),
+        financialFailure};
+    }
+    return {results,decisions,warnings,annualBaseline:ANNUAL_BASELINE,
+      executedInterventions,dailyLedger:ledger,dated:true};
   }
 
   function formatTime(t) {
@@ -772,14 +1214,156 @@ const SimulatorCore = (() => {
     annualBaseline: ANNUAL_BASELINE,
     createBaselineDecisions,
     simulate,
+    simulateDated,
+    addCalendarMonthISO,
+    makeDatedIntervention,
+    issueEffectiveDate,
     tollForDate,
-    formatTime
+    formatTime,
+    summarizePhysical,
+    applyMarkov,
+    deterministicDist
   };
 })();
 
 if (typeof window !== 'undefined') window.SimulatorCore = SimulatorCore;
 
 </script>
+<script>
+'use strict';
+// Continuous-time, time-inhomogeneous Markov probability-flow bridge.
+// The original validated 2-year P and P^n checkpoint distributions are NEVER
+// estimated anew. For each checkpoint step, a time-varying generator Q(t)
+// transports the starting distribution to exactly sP at the 2-year boundary.
+// Intermediate within-cycle states are an assumed smooth probability path,
+// NOT an empirically validated daily NBI deterioration forecast.
+const ContinuousPhysical = (() => {
+  const D=MODEL_DATA, C=SimulatorCore;
+  const START=2010, END=2026, EPS=1e-9;
+  const COMPONENTS=C.COMPONENTS;
+  const copy=s=>({dist:s.dist.slice(), unresolved:Number(s.unresolved)||0});
+  const onehot=r=>({dist:C.deterministicDist(r),unresolved:0});
+  const clamp=x=>Math.max(0,Math.min(1,x));
+  const ease=u=>{u=clamp(u);return u*u*(3-2*u);};
+  const easeDerivative=u=>{u=clamp(u);return 6*u*(1-u);};
+  const afterP=(component,start)=>{
+    const next=copy(start);
+    C.applyMarkov(component,next);
+    return next;
+  };
+  const bridge=(a,b,u)=>{
+    const w=ease(u);
+    return {dist:a.dist.map((v,i)=>v*(1-w)+b.dist[i]*w),
+            unresolved:a.unresolved*(1-w)+b.unresolved*w};
+  };
+  function build(sim){
+    const componentSegments={};
+    const complete=(component)=>{
+      const interventions=(sim.executedInterventions||[])
+        .filter(x=>x.component===component)
+        .slice().sort((a,b)=>a.startTime-b.startTime);
+      const segments=[];
+      let cursor=START,cycleStart=START,cycleEnd=START+2;
+      let startState=onehot(D.initialPhysical[component]);
+      function appendUntil(limit){
+        const target=Math.min(END,limit);
+        while(cursor<target-EPS){
+          const targetState=afterP(component,startState);
+          const stop=Math.min(target,cycleEnd);
+          segments.push({kind:'ctmc',from:cursor,to:stop,
+            cycleStart,cycleEnd,startState:copy(startState),targetState,
+            component});
+          cursor=stop;
+          if(cursor>=cycleEnd-EPS){
+            // The exact original 2-year P step at this checkpoint.
+            startState=targetState;
+            cycleStart=cycleEnd;
+            cycleEnd=cycleStart+2;
+          }
+        }
+      }
+      for(const intervention of interventions){
+        if(intervention.startTime>=END-EPS)break;
+        const beginning=Math.max(cursor,intervention.startTime);
+        appendUntil(beginning);
+        const active=segments.length?segments[segments.length-1]:null;
+        // Freeze the continuous pre-intervention state during works;
+        // the physical repair changes state at the recorded completion time.
+        const frozen=active && active.kind==='ctmc' && Math.abs(active.to-cursor)<EPS
+          ? bridge(active.startState,active.targetState,
+                   (cursor-active.cycleStart)/(active.cycleEnd-active.cycleStart))
+          : copy(startState);
+        const end=Math.min(intervention.endTime,END);
+        if(end>cursor+EPS){
+          segments.push({kind:'construction',from:cursor,to:end,
+            holdState:frozen,intervention:{...intervention},component});
+          cursor=end;
+        }
+        if(intervention.endTime>=END-EPS)break;
+        startState=onehot(intervention.target);
+        cycleStart=intervention.endTime;
+        cycleEnd=cycleStart+2;
+      }
+      appendUntil(END);
+      return segments;
+    };
+    for(const component of COMPONENTS)componentSegments[component]=complete(component);
+    function findSegment(component,time){
+      const list=componentSegments[component]||[];
+      const t=Math.min(END-1e-11,Math.max(START,time));
+      // Left-closed, right-open, so a completed repair or 2-year checkpoint
+      // belongs to the new segment, not the prior one.
+      return list.find(x=>t>=x.from-EPS && t<x.to-1e-12)||list[list.length-1];
+    }
+    function atTime(component,time){
+      const seg=findSegment(component,time);
+      if(!seg)return C.summarizePhysical(onehot(D.initialPhysical[component]));
+      if(seg.kind==='construction'){
+        return C.summarizePhysical({...copy(seg.holdState),construction:seg.intervention});
+      }
+      const u=(Math.min(END,time)-seg.cycleStart)/(seg.cycleEnd-seg.cycleStart);
+      return C.summarizePhysical(bridge(seg.startState,seg.targetState,u));
+    }
+    function generatorAt(component,time){
+      // Q(t) is a legitimate (possibly time-varying) Markov generator at
+      // interior times. States 0..9 use rating order 9..0; index 10 is the
+      // unresolved-Poor absorbing category from the original model.
+      const seg=findSegment(component,time);
+      const Q=Array.from({length:11},()=>Array(11).fill(0));
+      if(!seg||seg.kind!=='ctmc')return Q;
+      const u=clamp((time-seg.cycleStart)/(seg.cycleEnd-seg.cycleStart));
+      if(u<=0 || u>=1)return Q;
+      const s=bridge(seg.startState,seg.targetState,u);
+      const density=easeDerivative(u)/(seg.cycleEnd-seg.cycleStart);
+      for(let i=0;i<10;i++){
+        if(s.dist[i]<1e-13||seg.startState.dist[i]<=0)continue;
+        const p=D.matrices[component][i];
+        const total=p.reduce((a,b)=>a+b,0);
+        const rateBase=seg.startState.dist[i]*density/s.dist[i];
+        if(total<1e-12){
+          Q[i][10]=rateBase;Q[i][i]-=rateBase;
+        }else{
+          for(let j=0;j<10;j++){
+            if(i===j||p[j]<=0)continue;
+            Q[i][j]=rateBase*p[j];
+            Q[i][i]-=Q[i][j];
+          }
+        }
+      }
+      return Q;
+    }
+    return {segments:componentSegments,atTime,generatorAt};
+  }
+  const utcYearFraction=(date)=>{
+    const y=date.getUTCFullYear();
+    const first=Date.UTC(y,0,1),last=Date.UTC(y+1,0,1);
+    return y+(date.getTime()-first)/(last-first);
+  };
+  return {build,utcYearFraction,ease};
+})();
+if(typeof window!=='undefined')window.ContinuousPhysical=ContinuousPhysical;
+</script>
+
 <script>
 'use strict';
 
@@ -803,10 +1387,55 @@ if (typeof window !== 'undefined') window.SimulatorCore = SimulatorCore;
     sub: { select: 'subAction', rating: 'subRating', rec: 'subRec' }
   };
 
+  const BASELINE_SIM = C.simulate(C.createBaselineDecisions(), []);
+  const BASELINE_PHYSICAL = ContinuousPhysical.build(BASELINE_SIM);
   let decisions = C.createBaselineDecisions();
-  let sim = C.simulate(decisions);
-  let selectedYear = 2024;
-  let bondIssueMode = true;
+  let chainIssues = [];
+  let scheduledActions = [];
+  let scenarioSignature = null;
+  let sim = C.simulate(decisions, chainIssues);
+  let physicalBridge = ContinuousPhysical.build(sim);
+  let selectedYear = 2010;
+  const FIRST_YEAR = D.years[0];
+  const LAST_YEAR = D.years[D.years.length - 1];
+  const DAY_MS = 86400000;
+  const START_DATE_MS = Date.UTC(FIRST_YEAR,0,1);
+  const END_DATE_MS = Date.UTC(LAST_YEAR,11,31);
+  const LAST_DAY = Math.round((END_DATE_MS-START_DATE_MS)/DAY_MS);
+  let playbackDay = 0;
+  const playbackDate = () => new Date(START_DATE_MS + playbackDay*DAY_MS);
+  const isoDay = day => new Date(START_DATE_MS + day*DAY_MS).toISOString().slice(0,10);
+  const dayFromYear = year => Math.round((Date.UTC(year,0,1)-START_DATE_MS)/DAY_MS);
+  const yearFromDay = day => new Date(START_DATE_MS+day*DAY_MS).getUTCFullYear();
+  const smoothTime = () => ContinuousPhysical.utcYearFraction(playbackDate());
+  // The daily traffic archive is embedded directly in this HTML.
+  const TRAFFIC_DAILY = new Map(D.dailyTraffic.map(([date,count])=>[date,Number(count)]));
+  const DAILY = Array.from({length: LAST_DAY+1},(_,day)=>{
+    const date=isoDay(day);
+    const traffic=TRAFFIC_DAILY.has(date)?TRAFFIC_DAILY.get(date):null;
+    const toll=C.tollForDate(date);
+    return {day,date,traffic,toll,revenue:traffic===null?null:traffic*toll};
+  });
+  const YTD_GROSS = new Map();
+  const YTD_TRAFFIC = new Map();
+  let ytd=0, ytdTraffic=0, priorYear=null;
+  for(const entry of DAILY){
+    const yr=Number(entry.date.slice(0,4));
+    if(yr!==priorYear){ytd=0;ytdTraffic=0;priorYear=yr;}
+    ytd+=entry.revenue===null?0:entry.revenue;
+    ytdTraffic+=entry.traffic===null?0:entry.traffic;
+    YTD_GROSS.set(entry.day,ytd);
+    YTD_TRAFFIC.set(entry.day,ytdTraffic);
+  }
+  let playbackRunning = false;
+  let playbackTimer = null;
+  const enteredAmountByYear = {};
+  const enteredActionByDate = {};
+  // Freeze the decision editor's timestamp on first interaction while the
+  // playback clock continues to advance. No historical decision is silently
+  // moved to another date as the user types or uses the select dropdowns.
+  let decisionDraftDate = null;
+
 
   const $ = id => document.getElementById(id);
   const ns = 'http://www.w3.org/2000/svg';
@@ -840,11 +1469,73 @@ if (typeof window !== 'undefined') window.SimulatorCore = SimulatorCore;
     el.className = `message ${type}`.trim();
   }
 
-  function isDecisionModified(year) {
-    if (!decisions[year]) return false;
-    const d = decisions[year];
-    if (Math.abs((d.bondAmount || 0) - D.baselineDecisionIssue) > 1e-9) return true;
-    return C.COMPONENTS.some(c => (d.actions[c] || 'none') !== 'none');
+  const decisionDateNow=()=>isoDay(playbackDay);
+  const formDecisionDate=()=>decisionDraftDate||decisionDateNow();
+  const formDecisionYear=()=>Number(formDecisionDate().slice(0,4));
+  const effectiveDateNow=()=>C.addCalendarMonthISO(formDecisionDate());
+  const timeForISO=date=>ContinuousPhysical.utcYearFraction(new Date(Date.parse(date+'T00:00:00Z')));
+  function holdDecisionDate(){
+    if(decisionDraftDate!==null)return;
+    decisionDraftDate=decisionDateNow();
+    // Do not reconstruct any form controls while a select menu is opening.
+    const box=$('decisionDraftLock');
+    box.hidden=false;
+    $('decisionDraftLockText').textContent=`Decision date held at ${decisionDraftDate} while Play continues.`;
+  }
+  function releaseDecisionDate(){
+    decisionDraftDate=null;
+    $('decisionDraftLock').hidden=true;
+  }
+  const MODEL_LAST_ISO=`${LAST_YEAR}-12-31`;
+  const actionableNow=()=>effectiveDateNow()<=MODEL_LAST_ISO;
+  const issueActiveDate=ev=>C.issueEffectiveDate(ev);
+  // The visible scenario includes only actions whose one-month implementation
+  // lag has elapsed. A decision may be scheduled without rewriting history.
+  function refreshScenario(){
+    const date=decisionDateNow();
+    const activeActions=scheduledActions.filter(x=>x.effectiveDate<=date);
+    const activeIssues=chainIssues.filter(x=>issueActiveDate(x)<=date);
+    const signature=JSON.stringify([decisions,activeActions.map(x=>x.id),
+      activeIssues.map(x=>`${x.txHash}:${x.logIndex||0}:${x.modelDecisionDate||''}`)]);
+    if(signature===scenarioSignature)return false;
+    scenarioSignature=signature;
+    sim=C.simulateDated(decisions,activeIssues,activeActions);
+    physicalBridge=ContinuousPhysical.build(sim);
+    annualChartCache=null;
+    return true;
+  }
+  function pendingForComponent(comp,date=decisionDateNow()){
+    return scheduledActions.find(x=>x.component===comp &&
+      x.decisionDate<=date && x.endDate>date) || null;
+  }
+  function renderDecisionSchedule(){
+    const box=$('scheduleList');
+    if(!box)return;
+    const date=decisionDateNow();
+    const records=[
+      ...scheduledActions.map(x=>({kind:x.componentLabel,decisionDate:x.decisionDate,
+        effectiveDate:x.effectiveDate,endDate:x.endDate,label:x.label})),
+      ...chainIssues.map(x=>({kind:'Bond ERC-20',decisionDate:x.modelDecisionDate||`${x.modelYear} (legacy year only)`,
+        effectiveDate:issueActiveDate(x),endDate:null,label:money(Number(x.principalM),3)}))
+    ].sort((a,b)=>b.effectiveDate.localeCompare(a.effectiveDate));
+    box.replaceChildren();
+    if(!records.length){box.textContent='No submitted repairs or confirmed ERC-20 transactions.';return;}
+    for(const rec of records.slice(0,9)){
+      const div=document.createElement('div');div.className='schedule-row';
+      const state=date<rec.effectiveDate?'PENDING':rec.endDate&&date>=rec.endDate?'COMPLETED':'ACTIVE';
+      const title=document.createElement('b');title.textContent=`${rec.kind} · ${rec.label}`;
+      const stateEl=document.createElement('span');stateEl.className='state '+state.toLowerCase();stateEl.textContent=state;
+      const detail=document.createElement('div');
+      detail.textContent=`Decided ${rec.decisionDate} → effective ${rec.effectiveDate}`+(rec.endDate?` → finish ${rec.endDate}`:'');
+      div.append(title,' · ',stateEl,detail);box.appendChild(div);
+    }
+    if(records.length>9){const more=document.createElement('div');more.textContent=`+ ${records.length-9} more records`;box.appendChild(more);}
+  }
+  function isDecisionModified(year){
+    if(scheduledActions.some(x=>Number(x.decisionDate.slice(0,4))===year))return true;
+    if(chainIssues.some(ev=>Number(ev.modelYear)===year))return true;
+    const d=decisions[year];
+    return Boolean(d&&Math.abs((d.bondAmount||0)-D.baselineDecisionIssue)>1e-9);
   }
 
   function renderTimeline() {
@@ -856,12 +1547,14 @@ if (typeof window !== 'undefined') window.SimulatorCore = SimulatorCore;
       btn.className = 'year';
       if (year === selectedYear) btn.classList.add('active');
       if (year === 2025) btn.classList.add('terminal');
-      if (year < 2025 && isDecisionModified(year)) btn.classList.add('has-action');
+      if (isDecisionModified(year)) btn.classList.add('has-action');
       btn.textContent = year;
       btn.setAttribute('aria-label', `Select ${year}`);
+      btn.setAttribute('aria-pressed', String(year === selectedYear));
       btn.addEventListener('click', () => {
-        selectedYear = year;
-        renderAll();
+        releaseDecisionDate();
+        // Navigating by year is allowed during Play; explicit Pause still stops it.
+        setPlaybackDay(dayFromYear(year),{pause:false});
       });
       box.appendChild(btn);
     }
@@ -886,14 +1579,17 @@ if (typeof window !== 'undefined') window.SimulatorCore = SimulatorCore;
       select.appendChild(opt);
     }
     select.value = ACTIONS.some(a => a[0] === storedValue) ? storedValue : 'none';
-    select.disabled = selectedYear === 2025 || Boolean(snapshot.construction);
+    const pending=pendingForComponent(comp);
+    select.disabled = !actionableNow() || Boolean(snapshot.construction) || Boolean(pending);
 
     const badge = $(ids.rating);
     badge.textContent = `MAP ${snapshot.map}`;
     badge.className = `rating ${ratingClass(snapshot.map)}`.trim();
 
     const note = $(ids.rec);
-    if (snapshot.construction) {
+    if (pending && !snapshot.construction) {
+      note.textContent=`Scheduled: ${pending.label}; starts ${pending.effectiveDate}, completes ${pending.endDate}. Another action is not permitted until completion.`;
+    } else if (snapshot.construction) {
       note.textContent = `In progress: ${snapshot.construction.label}; scheduled completion ${C.formatTime(snapshot.construction.endTime)}. No new action allowed.`;
     } else if (snapshot.map === 0) {
       note.textContent = 'Failure state. No intervention option is enabled in the current mock rule set.';
@@ -905,54 +1601,46 @@ if (typeof window !== 'undefined') window.SimulatorCore = SimulatorCore;
     }
   }
 
-  function executionSummaryForDecisionYear(year) {
-    if (year >= 2025) return { text: '2025 is the terminal state. No new decision is executed after the model horizon.', type: '' };
-    const exec = sim.results[year + 1];
-    if (!exec) return { text: `Decision executes on Jan 1 ${year + 1}.`, type: '' };
-    const events = exec.executionEvents || [];
-    if (!events.length) return { text: `Decision executes on Jan 1 ${year + 1}. Repair actions are optional; bond issuance follows the stored amount.`, type: '' };
-    const parts = events.map(e => `${C.COMPONENT_LABELS[e.component]}: ${e.status.toUpperCase()} — ${e.reason}`);
-    const type = events.some(e => e.status === 'invalid') ? 'error' : events.some(e => e.status === 'blocked') ? 'warning' : 'success';
-    return { text: parts.join(' | '), type };
+  function actionDraftForCurrentDate(){
+    return enteredActionByDate[formDecisionDate()]||{deck:'none',super:'none',sub:'none'};
   }
 
   function renderDecisionPanel() {
-    const r = sim.results[selectedYear];
-    $('selectedYear').textContent = selectedYear;
-    const terminal = selectedYear === 2025;
-    const d = terminal ? null : decisions[selectedYear];
-    const amount = d ? Number(d.bondAmount || 0) : 0;
-    bondIssueMode = !terminal && amount > 0;
-
-    $('bondYes').classList.toggle('active', bondIssueMode);
-    $('bondNo').classList.toggle('active', !bondIssueMode);
-    $('bondYes').disabled = terminal;
-    $('bondNo').disabled = terminal;
-    $('bondAmount').disabled = terminal || !bondIssueMode;
-    $('bondAmount').value = terminal ? '0' : String(amount);
-
-    if (terminal) {
-      $('decisionTiming').textContent = 'Terminal state. 2025 decisions are disabled.';
-    } else {
-      const issueYear = selectedYear + 1;
-      const rate = Number(D.couponByYear[String(issueYear)]) || 0;
-      const rating = D.moodyRatingByYear[String(issueYear)] || '–';
-      $('decisionTiming').textContent = `Decision executes Jan 1 ${issueYear}. Configured issue coupon: ${(rate * 100).toFixed(3)}% (${rating}).`;
+    const date=formDecisionDate();
+    const year=formDecisionYear();
+    const r=sim.results[year];
+    $('selectedYear').textContent=year;
+    $('selectedDate').textContent=date;
+    const disabled=!actionableNow(), walletBusy=Boolean(window.SingleBondWallet?.getState()?.busy);
+    $('bondYes').disabled=disabled||walletBusy;
+    $('bondNo').disabled=year===LAST_YEAR;
+    $('bondAmount').disabled=disabled;
+    if(decisionDraftDate===null){
+      $('bondAmount').value=String(enteredAmountByYear[year]??D.baselineDecisionIssue);
     }
-
-    for (const comp of C.COMPONENTS) {
-      const stored = d && d.actions ? (d.actions[comp] || 'none') : 'none';
-      populateActionSelect(comp, r.components[comp], stored);
+    const effective=effectiveDateNow();
+    $('decisionTiming').textContent=disabled
+      ? `Decision ${date} → ${effective}. Activation is beyond the 2025 model horizon; issuance and new repairs are disabled.`
+      : `Decision ${date} → scheduled activation ${effective} (one calendar month later). Sepolia mints immediately if approved; accounting starts on ${effective}.`;
+    $('decisionDraftLock').hidden=decisionDraftDate===null;
+    $('decisionUseLiveDate').disabled=walletBusy;
+    if(decisionDraftDate!==null){
+      $('decisionDraftLockText').textContent=`Decision date held at ${date} while Play continues.`;
+    }else{
+      // Rebuild selects only when the editor is not being used. Recreating
+      // <option> nodes during an open native menu closes the menu.
+      const draft=actionDraftForCurrentDate();
+      for(const comp of C.COMPONENTS){
+        const snap=physicalBridge.atTime(comp,smoothTime());
+        populateActionSelect(comp,snap,draft[comp]||'none');
+      }
     }
-
-    $('applyBtn').disabled = terminal;
-    const cashPass = r.cashEnd >= -1e-9;
-    const dscrPass = r.dscr === null || r.dscr >= D.minDSCR - 1e-9;
-    setCheck($('cashCheck'), 'Cash check', cashPass, money(r.cashEnd, 2));
-    setCheck($('dscrCheck'), 'DSCR ≥ 1.75', dscrPass, r.dscr === null ? 'N/A' : `${r.dscr.toFixed(2)}×`);
-
-    const summary = executionSummaryForDecisionYear(selectedYear);
-    setMessage(summary.text, summary.type);
+    $('applyBtn').disabled=disabled;
+    const cashPass=r.cashEnd>=-1e-9;
+    const dscrPass=r.dscr===null||r.dscr>=D.minDSCR-1e-9;
+    setCheck($('cashCheck'),'Projected year-end cash',cashPass,money(r.cashEnd,2));
+    setCheck($('dscrCheck'),'Annual DSCR ≥ 1.75',dscrPass,r.dscr===null?'N/A':`${r.dscr.toFixed(2)}×`);
+    renderDecisionSchedule();
   }
 
   function setCheck(el, label, pass, value) {
@@ -960,18 +1648,99 @@ if (typeof window !== 'undefined') window.SimulatorCore = SimulatorCore;
     el.innerHTML = `${escapeHtml(label)}<strong>${pass ? 'PASS' : 'FAIL'} · ${escapeHtml(value)}</strong>`;
   }
 
+  function elapsedYearFraction() {
+    const now=playbackDate(), year=now.getUTCFullYear();
+    return Math.max(0,Math.min(1,(now.getTime()+DAY_MS-Date.UTC(year,0,1))/(Date.UTC(year+1,0,1)-Date.UTC(year,0,1))));
+  }
+  function playbackYearPosition(){
+    return selectedYear+elapsedYearFraction();
+  }
+  function compareDelta(baseline,scenario,formatter){
+    const delta=scenario-baseline;
+    if(Math.abs(delta)<1e-9)return 'Δ 0';
+    return `Δ ${delta>0?'+':'−'}${formatter(Math.abs(delta))}`;
+  }
+  function compareKpi(id,baseline,scenario,formatter,extra=''){
+    const box=$(id).closest('.kpi');
+    if(!box)return;
+    let el=box.querySelector('.baseline-value');
+    if(!el){el=document.createElement('div');el.className='baseline-value';box.appendChild(el);}
+    el.innerHTML=`Baseline ${escapeHtml(formatter(baseline))} · <span class="difference">${escapeHtml(compareDelta(baseline,scenario,formatter))}</span>${extra?`<span class="asof-note">${escapeHtml(extra)}</span>`:''}`;
+  }
+  function currentYTD(which,mode='scenario'){
+    const b=which==='traffic'?(YTD_TRAFFIC.get(playbackDay)||0):(YTD_GROSS.get(playbackDay)||0);
+    if(mode==='baseline')return b;
+    const today=sim.dailyLedger?.[decisionDateNow()];
+    if(today){return which==='traffic'?today.ytdTraffic:today.ytdGrossRevenue*1e6;}
+    return b*(1-sim.results[selectedYear].trafficLoss);
+  }
+  function asOfFinancial(simulation){
+    const today=simulation.dailyLedger?.[decisionDateNow()];
+    if(today){return {...today, ytdRevenue:today.ytdGrossRevenue,
+      fraction:today.fraction};}
+    const r=simulation.results[selectedYear],fraction=elapsedYearFraction();
+    const ytdRevenue=(YTD_GROSS.get(playbackDay)||0)/1e6*(1-r.trafficLoss);
+    const ytdNet=ytdRevenue*(1-D.opexShare);
+    let accruedCapex=0;
+    const until=selectedYear+fraction;
+    for(const x of simulation.executedInterventions||[]){
+      if(!(x.duration>0))continue;
+      const active=Math.max(0,Math.min(until,x.endTime)-Math.max(selectedYear,x.startTime));
+      accruedCapex+=active*x.cost/x.duration;
+    }
+    const reachedYearEnd=fraction>1-1e-9;
+    const cash=r.cashStart+r.bondProceeds+ytdNet-r.interestDS*fraction-
+      (reachedYearEnd?r.principalDS:0)-accruedCapex;
+    const principal=r.endingPrincipal+(reachedYearEnd?0:r.principalDS);
+    return {cash,principal,ytdNet,ytdRevenue,accruedCapex,fraction};
+  }
+  function renderComparisonStatus(){
+    const years=D.decisionYears.filter(y=>Math.abs((decisions[y]?.bondAmount||0)-D.baselineDecisionIssue)>1e-9);
+    const parts=[];
+    if(years.length)parts.push(`${years.length} mock year override${years.length===1?'':'s'}`);
+    if(scheduledActions.length)parts.push(`${scheduledActions.length} dated repair${scheduledActions.length===1?'':'s'}`);
+    if(chainIssues.length)parts.push(`${chainIssues.length} Sepolia issuance${chainIssues.length===1?'':'s'}`);
+    $('comparisonStatus').textContent=parts.length?parts.join(' · '):'No scenario changes';
+  }
   function renderKPIs() {
-    const r = sim.results[selectedYear];
-    $('trafficKpi').textContent = trafficM(r.traffic);
-    $('grossKpi').textContent = money(r.grossRevenue, 1);
-    $('netKpi').textContent = money(r.netRevenue, 1);
-    $('trafficLossKpi').textContent = pct(r.trafficLoss, 2);
-    $('cashKpi').textContent = money(r.cashEnd, 1);
-    $('bondKpi').textContent = money(r.bondProceeds, 1);
-    $('capexKpi').textContent = money(r.interventionCost, 2);
-    $('dscrKpi').textContent = r.dscr === null ? 'N/A' : `${r.dscr.toFixed(2)}×`;
-    $('debtServiceKpi').textContent = money(r.debtService, 1);
-    $('principalKpi').textContent = money(r.endingPrincipal, 1);
+    const r=sim.results[selectedYear],b=BASELINE_SIM.results[selectedYear];
+    const asof=asOfFinancial(sim),baseAsof=asOfFinancial(BASELINE_SIM);
+    const trafficNow=currentYTD('traffic'),trafficBase=currentYTD('traffic','baseline');
+    const grossNow=currentYTD('revenue')/1e6,grossBase=currentYTD('revenue','baseline')/1e6;
+    const netNow=grossNow*(1-D.opexShare),netBase=grossBase*(1-D.opexShare);
+    $('trafficKpi').textContent=trafficM(trafficNow);
+    $('grossKpi').textContent=money(grossNow,1);
+    $('netKpi').textContent=money(netNow,1);
+    const ytdLoss=trafficBase>0?Math.max(0,1-trafficNow/trafficBase):0;
+    $('trafficLossKpi').textContent=pct(ytdLoss,2);
+    $('cashKpi').textContent=money(asof.cash,1);
+    $('bondKpi').textContent=money(r.bondProceeds,1);
+    $('bondKpi').title=`Includes ${money(r.chainProceeds||0,3)} confirmed Sepolia ERC-20 issuance (hypothetical funding at par).`;
+    $('capexKpi').textContent=money(asof.accruedCapex,2);
+    $('dscrKpi').textContent=r.dscr===null?'N/A':`${r.dscr.toFixed(2)}×`;
+    $('debtServiceKpi').textContent=money(r.debtService,1);
+    $('principalKpi').textContent=money(asof.principal,1);
+    compareKpi('trafficKpi',trafficBase,trafficNow,trafficM);
+    compareKpi('grossKpi',grossBase,grossNow,v=>money(v,2));
+    compareKpi('netKpi',netBase,netNow,v=>money(v,2));
+    compareKpi('trafficLossKpi',0,ytdLoss,v=>pct(v,2));
+    compareKpi('cashKpi',baseAsof.cash,asof.cash,v=>money(v,2));
+    compareKpi('bondKpi',b.bondProceeds,r.bondProceeds,v=>money(v,2));
+    compareKpi('capexKpi',baseAsof.accruedCapex,asof.accruedCapex,v=>money(v,2));
+    compareKpi('dscrKpi',b.dscr||0,r.dscr||0,v=>`${v.toFixed(3)}×`);
+    compareKpi('debtServiceKpi',b.debtService,r.debtService,v=>money(v,2));
+    compareKpi('principalKpi',baseAsof.principal,asof.principal,v=>money(v,2));
+    $('annualTrafficTime').textContent=`Replay ${isoDay(playbackDay)} · completed years: full annual totals · ${selectedYear}: cumulative YTD · later years: not yet reached`;
+  }
+  function renderAsOfStrip(){
+    const a=asOfFinancial(sim),b=asOfFinancial(BASELINE_SIM);
+    const rs=sim.results[selectedYear],rb=BASELINE_SIM.results[selectedYear];
+    $('asofCash').textContent=money(a.cash,2);
+    $('asofCashBase').textContent=`Baseline ${money(b.cash,2)} · ${compareDelta(b.cash,a.cash,v=>money(v,2))}`;
+    $('asofDebt').textContent=money(a.principal,2);
+    $('asofDebtBase').textContent=`Baseline ${money(b.principal,2)} · ${compareDelta(b.principal,a.principal,v=>money(v,2))}`;
+    $('asofDscr').textContent=rs.dscr===null?'N/A':`${rs.dscr.toFixed(3)}×`;
+    $('asofDscrBase').textContent=`Baseline ${rb.dscr===null?'N/A':rb.dscr.toFixed(3)+'×'} · annual forecast`;
   }
 
   function svgEl(tag, attrs = {}, text = '') {
@@ -996,12 +1765,15 @@ if (typeof window !== 'undefined') window.SimulatorCore = SimulatorCore;
     if (rightTicks) svg.appendChild(svgEl('line', { x1:width-right, y1:top, x2:width-right, y2:height-bottom, class:'axis' }));
 
     const tickYears = xYears.filter((y, i) => i === 0 || i === xYears.length - 1 || i % 3 === 0);
-    const x = year => left + (year - xYears[0]) / (xYears[xYears.length - 1] - xYears[0]) * plotW;
+    // Reserve the final annual interval to let the cursor traverse all of 2025.
+    const x = year => left + (year - xYears[0]) / (xYears[xYears.length - 1] + 1 - xYears[0]) * plotW;
     for (const year of tickYears) {
       svg.appendChild(svgEl('text', { x:x(year), y:height-bottom+18, 'text-anchor':'middle', class:'axis-label' }, year));
     }
-    if (selected >= xYears[0] && selected <= xYears[xYears.length-1]) {
-      svg.appendChild(svgEl('line', { x1:x(selected), y1:top, x2:x(selected), y2:height-bottom, class:'selected-marker' }));
+    if (selected >= xYears[0] && selected <= xYears[xYears.length-1]+1) {
+      const px=Math.min(width-right,Math.max(left,x(selected)));
+      svg.appendChild(svgEl('line', {x1:px,y1:top,x2:px,y2:height-bottom,class:'selected-marker',stroke:'#6e819b'}));
+      svg.appendChild(svgEl('text',{x:Math.max(left+44,Math.min(width-right-44,px)),y:top+12,'text-anchor':'middle',class:'chart-progress-date'},isoDay(playbackDay)));
     }
 
     if (leftTicks) {
@@ -1041,202 +1813,998 @@ if (typeof window !== 'undefined') window.SimulatorCore = SimulatorCore;
         fill:stroke, class:'chart-point', tabindex:'0', 'data-year':yr
       });
       c.appendChild(svgEl('title', {}, `${yr}: ${tooltipFormatter(values[i])}`));
-      c.addEventListener('click', () => { selectedYear = yr; renderAll(); });
-      c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedYear = yr; renderAll(); } });
+      c.addEventListener('click', () => jumpToYear(yr));
+      c.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jumpToYear(yr); } });
       svg.appendChild(c);
     });
   }
 
-  function renderTrafficRevenueChart() {
-    const svg = $('trafficRevenueChart');
-    const years = D.years;
-    const traffic = years.map(y => sim.results[y].traffic / 1e6);
-    const revenue = years.map(y => sim.results[y].grossRevenue);
-    const width=900, height=270, left=55, right=58, top=25, bottom=38;
-    const tMax = Math.max(...traffic) * 1.08;
-    const rMax = Math.max(...revenue) * 1.08;
-    const frame = chartFrame(svg, {
-      width,height,left,right,top,bottom,xYears:years,selected:selectedYear,
-      leftTicks:ticksForMax(tMax, v => v.toFixed(0)),
-      rightTicks:ticksForMax(rMax, v => v.toFixed(0)),
-      leftTitle:'Traffic (M)',rightTitle:'Gross revenue ($M)'
-    });
-    const yT = v => top + (height-top-bottom) * (1 - v/tMax);
-    const yR = v => top + (height-top-bottom) * (1 - v/rMax);
-    const idx = years.indexOf(selectedYear);
-    addLine(svg, years, traffic, frame.x, yT, '#2f5fa7', idx, v => `${v.toFixed(2)}M vehicles`);
-    addLine(svg, years, revenue, frame.x, yR, '#4b8f6a', idx, v => `$${v.toFixed(2)}M`);
+  function baselineLine(svg,years,values,x,y,stroke,name){
+    const points=years.map((yr,i)=>`${x(yr)},${y(values[i])}`).join(' ');
+    const line=svgEl('polyline',{points,fill:'none',stroke,'stroke-width':3.2,'stroke-dasharray':'6 4',opacity:0.78,'vector-effect':'non-scaling-stroke'});
+    line.appendChild(svgEl('title',{},name+' · fixed baseline, 2010–2025'));
+    svg.appendChild(line);
   }
-
-  function renderSingleChart(svg, values, opts) {
-    const years = D.years;
-    const width=440, height=260, left=50, right=18, top=25, bottom=38;
-    let min = opts.min !== undefined ? opts.min : Math.min(...values);
-    let max = opts.max !== undefined ? opts.max : Math.max(...values);
-    if (opts.zeroFloor) min = Math.min(0, min);
-    if (max - min < 1e-9) max = min + 1;
-    const pad = (max-min)*0.08;
-    if (opts.min === undefined) min -= pad;
-    if (opts.max === undefined) max += pad;
-    if (opts.zeroFloor && min > 0) min = 0;
-    const ticks=[];
-    for(let i=0;i<=4;i++){
-      const pos=i/4;
-      const val=max-(max-min)*pos;
-      ticks.push({pos,label:opts.tickFormat(val)});
+  function progressPoint(svg,x,y,value,color,text,{ghost=false}={}){
+    if(!Number.isFinite(value))return;
+    const marker=svgEl('circle',{cx:x(playbackYearPosition()),cy:y(value),r:ghost?4.1:5,fill:ghost?'#fff':color,stroke:color,'stroke-width':ghost?2.2:2.5,opacity:ghost?.65:1});
+    marker.appendChild(svgEl('title',{},text));
+    svg.appendChild(marker);
+  }
+  // Both scenarios are measured over the SAME time window: completed years
+  // use annual totals; current year is cumulative through playback date;
+  // future years are hidden.  The model's underlying annual values never
+  // change merely because Play advances the display clock.
+  let annualChartCache=null;
+  function renderTrafficRevenueChart(){
+    const svg=$('trafficRevenueChart'),years=D.years;
+    if(!annualChartCache||annualChartCache.sim!==sim){
+      svg.replaceChildren();
+      const annualSeries=[
+        {title:'TRAFFIC  ·  MILLION VEHICLES',key:'traffic',
+         base:years.map(y=>BASELINE_SIM.results[y].traffic/1e6),
+         scenario:years.map(y=>sim.results[y].traffic/1e6),
+         top:34,bottom:160,baseColor:'#dce6f2',scenarioColor:'#2f5fa7',
+         format:v=>`${v.toFixed(2)} million vehicles`,label:v=>v.toFixed(1)},
+        {title:'GROSS TOLL REVENUE  ·  $M',key:'revenue',
+         base:years.map(y=>BASELINE_SIM.results[y].grossRevenue),
+         scenario:years.map(y=>sim.results[y].grossRevenue),
+         top:192,bottom:318,baseColor:'#dcece2',scenarioColor:'#397c55',
+         format:v=>`$${v.toFixed(2)}M`,label:v=>v.toFixed(0)}
+      ];
+      const width=900,left=55,right=22,step=(width-left-right)/years.length;
+      const center=i=>left+(i+.5)*step;
+      const barWidth=Math.min(16,Math.max(9,step*.28));
+      const band=svgEl('rect',{x:left+1,y:18,width:step-2,height:310,rx:4,fill:'#eaf1fb',opacity:.85,'data-current-year':selectedYear});
+      svg.appendChild(band);
+      const rects=new Map();
+      for(const series of annualSeries){
+        series.max=Math.max(1,...series.base,...series.scenario)*1.08;
+        const py=v=>series.bottom-(v/series.max)*(series.bottom-series.top);
+        svg.appendChild(svgEl('text',{x:left,y:series.top-13,fill:'#47566a','font-size':12,'font-weight':700},series.title));
+        for(let i=0;i<=4;i++){
+          const level=series.max*(4-i)/4;
+          const y=series.top+(series.bottom-series.top)*i/4;
+          svg.appendChild(svgEl('line',{x1:left,y1:y,x2:width-right,y2:y,stroke:i===4?'#bdc9d8':'#e9eef4','stroke-width':i===4?1.2:1}));
+          svg.appendChild(svgEl('text',{x:left-8,y:y+3,'text-anchor':'end',fill:'#738197','font-size':10},series.label(level)));
+        }
+        years.forEach((year,i)=>{
+          for(const [kind,x,fill] of [
+            ['baseline',center(i)-barWidth-1.5,series.baseColor],
+            ['scenario',center(i)+1.5,series.scenarioColor]
+          ]){
+            const rect=svgEl('rect',{
+              x,y:series.bottom,width:barWidth,height:0,rx:1.1,fill,
+              'data-year':year,'data-series':series.key,'data-variant':kind,
+              'data-status':'future',class:'annual-bar',tabindex:0,role:'button'
+            });
+            rect.addEventListener('click',()=>jumpToYear(year));
+            rect.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();jumpToYear(year);}});
+            const title=svgEl('title',{});rect.appendChild(title);
+            svg.appendChild(rect);
+            rects.set(`${series.key}-${year}-${kind}`,{rect,title,series});
+          }
+        });
+      }
+      years.forEach((year,i)=>{
+        if(i%2!==0&&i!==years.length-1)return;
+        const text=svgEl('text',{x:center(i),y:339,'text-anchor':'middle','font-size':10,fill:'#7c899b'},String(year));
+        svg.appendChild(text);
+      });
+      annualChartCache={sim,rects,band,left,step,yearLabels:svg.querySelectorAll('text')};
     }
-    const frame=chartFrame(svg,{width,height,left,right,top,bottom,xYears:years,selected:selectedYear,leftTicks:ticks,leftTitle:opts.axisTitle});
+    const cache=annualChartCache;
+    cache.band.setAttribute('x',String(cache.left+(selectedYear-FIRST_YEAR)*cache.step+1));
+    cache.band.setAttribute('data-current-year',String(selectedYear));
+    for(const year of years){
+      const status=year<selectedYear?'complete':year===selectedYear?'ytd':'future';
+      for(const key of ['traffic','revenue']){
+        const baselineNow=status==='future'?0:status==='complete'
+          ? (key==='traffic'?BASELINE_SIM.results[year].traffic/1e6:BASELINE_SIM.results[year].grossRevenue)
+          : (key==='traffic'?currentYTD('traffic','baseline')/1e6:currentYTD('revenue','baseline')/1e6);
+        const scenarioNow=status==='future'?0:status==='complete'
+          ? (key==='traffic'?sim.results[year].traffic/1e6:sim.results[year].grossRevenue)
+          : (key==='traffic'?currentYTD('traffic')/1e6:currentYTD('revenue')/1e6);
+        for(const [kind,value] of [['baseline',baselineNow],['scenario',scenarioNow]]){
+          const {rect,title,series}=cache.rects.get(`${key}-${year}-${kind}`);
+          const h=Math.max(0,Math.min(series.bottom-series.top,value/series.max*(series.bottom-series.top)));
+          // Geometry via CSS SVG properties permits smooth transitions on each playback step.
+          // Attribute geometry is also updated as a fallback for older browsers.
+          const y=series.bottom-h;
+          rect.style.setProperty('y',y.toFixed(3)+'px');
+          rect.style.setProperty('height',h.toFixed(3)+'px');
+          rect.setAttribute('y',y.toFixed(3));
+          rect.setAttribute('height',h.toFixed(3));
+          rect.setAttribute('data-status',status);
+          rect.setAttribute('data-value',value.toFixed(6));
+          const period=status==='complete'?'full calendar year':status==='ytd'?`YTD through ${isoDay(playbackDay)}`:'not reached';
+          const label=`${year} ${kind==='baseline'?'Baseline':'Decision'} ${key}, ${period}: ${series.format(value)}`;
+          rect.setAttribute('aria-label',label+'; select year');
+          title.textContent=label;
+        }
+      }
+    }
+    for(const t of svg.querySelectorAll('text')){
+      if(t.textContent===String(selectedYear)){
+        t.setAttribute('fill','#2f5fa7');t.setAttribute('font-weight','750');
+      }else if(/^20(1[0-9]|2[0-5])$/.test(t.textContent||'')){
+        t.setAttribute('fill','#7c899b');t.setAttribute('font-weight','400');
+      }
+    }
+  }
+  function renderSingleChart(svg, values, opts) {
+    const years=D.years,baseValues=opts.baselineValues||values;
+    const width=440,height=260,left=50,right=18,top=25,bottom=38;
+    // Scale to already-reached years (plus the active annual forecast), not hidden futures.
+    const all=years.filter(yr=>yr<=selectedYear).flatMap(yr=>[values[yr-FIRST_YEAR],baseValues[yr-FIRST_YEAR]]).filter(Number.isFinite);
+    if(Number.isFinite(opts.asOf))all.push(opts.asOf);
+    if(Number.isFinite(opts.baselineAsOf))all.push(opts.baselineAsOf);
+    let min=opts.min!==undefined?opts.min:Math.min(...all);
+    let max=opts.max!==undefined?opts.max:Math.max(...all);
+    if(opts.zeroFloor)min=Math.min(0,min);
+    if(max-min<1e-9)max=min+1;
+    const pad=(max-min)*.08;
+    if(opts.min===undefined)min-=pad;
+    if(opts.max===undefined)max+=pad;
+    if(opts.zeroFloor&&min>0)min=0;
+    const ticks=Array.from({length:5},(_,i)=>({pos:i/4,label:opts.tickFormat(max-(max-min)*i/4)}));
+    const frame=chartFrame(svg,{width,height,left,right,top,bottom,xYears:years,selected:playbackYearPosition(),leftTicks:ticks,leftTitle:opts.axisTitle});
     const y=v=>top+(height-top-bottom)*(1-(v-min)/(max-min));
-    if(opts.threshold!==undefined && opts.threshold>=min && opts.threshold<=max){
+    if(opts.threshold!==undefined&&opts.threshold>=min&&opts.threshold<=max){
       const yy=y(opts.threshold);
       svg.appendChild(svgEl('line',{x1:left,y1:yy,x2:width-right,y2:yy,class:'threshold-line'}));
       svg.appendChild(svgEl('text',{x:width-right-2,y:yy-5,'text-anchor':'end',class:'axis-label',fill:'#b42318'},`${opts.threshold.toFixed(2)} threshold`));
     }
-    const idx=years.indexOf(selectedYear);
-    addLine(svg,years,values,frame.x,y,opts.stroke,idx,opts.tooltipFormat);
+    const currentX=frame.x(playbackYearPosition());
+    const currentValue=opts.asOf;
+    const baselineCurrentValue=opts.baselineAsOf;
+    // For cash, past year-end observations belong at the end of the year;
+    // for DSCR, each value is an ANNUAL measure placed at the year center.
+    const past=years.filter(yr=>yr<selectedYear);
+    const pointX=yr=>frame.x(yr+(opts.stock?1:0.5));
+    for(const [kind,full,current,color] of [
+      ['baseline',baseValues,baselineCurrentValue,opts.baselineStroke],
+      ['scenario',values,currentValue,opts.stroke]
+    ]){
+      const pts=past.map(yr=>({x:pointX(yr),v:full[yr-FIRST_YEAR],yr}));
+      if(Number.isFinite(current))pts.push({x:currentX,v:current,yr:selectedYear});
+      if(pts.length>=2){
+        const path=svgEl('polyline',{
+          points:pts.map(p=>`${p.x.toFixed(2)},${y(p.v).toFixed(2)}`).join(' '),
+          fill:'none',stroke:color,'stroke-width':kind==='baseline'?1.7:2.15,
+          'stroke-dasharray':kind==='baseline'?'5 5':'',
+          opacity:kind==='baseline'?.55:1,'vector-effect':'non-scaling-stroke',
+          'data-chart-variant':kind
+        });
+        path.appendChild(svgEl('title',{},`${kind} · visible through ${isoDay(playbackDay)}`));
+        svg.appendChild(path);
+      }
+      for(const pt of pts){
+        const isCurrent=pt.yr===selectedYear;
+        const radius=isCurrent?(kind==='baseline'?2.1:2.6):(kind==='baseline'?1.2:1.6);
+        const marker=svgEl('circle',{
+          cx:pt.x,cy:y(pt.v),r:radius,
+          fill:kind==='baseline'?'#fff':color,stroke:color,
+          'stroke-width':kind==='baseline'?1.0:.5,
+          opacity:kind==='baseline'?.57:1,
+          'data-chart-variant':kind,'data-year':pt.yr,
+          'data-current-point':String(isCurrent)
+        });
+        marker.appendChild(svgEl('title',{},`${pt.yr} ${kind}: ${opts.tooltipFormat(pt.v)}`));
+        svg.appendChild(marker);
+      }
+    }
   }
-
-  function renderFinancialCharts() {
-    const years = D.years;
-    renderSingleChart($('cashChart'), years.map(y => sim.results[y].cashEnd), {
-      zeroFloor:true, axisTitle:'Cash ($M)', stroke:'#8b5cf6',
-      tickFormat:v=>v.toFixed(0), tooltipFormat:v=>`$${v.toFixed(2)}M`
+  function renderFinancialCharts(){
+    const years=D.years;
+    const asOf=asOfFinancial(sim),baseAsOf=asOfFinancial(BASELINE_SIM);
+    renderSingleChart($('cashChart'),years.map(y=>sim.results[y].cashEnd),{
+      baselineValues:years.map(y=>BASELINE_SIM.results[y].cashEnd),
+      asOf:asOf.cash,baselineAsOf:baseAsOf.cash,stock:true,
+      zeroFloor:true,axisTitle:'Cash ($M)',stroke:'#7546cf',baselineStroke:'#cfc4e3',
+      tickFormat:v=>v.toFixed(0),tooltipFormat:v=>`$${v.toFixed(2)}M`
     });
-    const vals = years.map(y => sim.results[y].dscr === null ? 0 : sim.results[y].dscr);
-    renderSingleChart($('dscrChart'), vals, {
-      min:0, axisTitle:'DSCR (×)', stroke:'#9b5b00', threshold:D.minDSCR,
-      tickFormat:v=>v.toFixed(1), tooltipFormat:v=>`${v.toFixed(2)}×`
+    renderSingleChart($('dscrChart'),years.map(y=>sim.results[y].dscr??0),{
+      baselineValues:years.map(y=>BASELINE_SIM.results[y].dscr??0),
+      asOf:sim.results[selectedYear].dscr??0,baselineAsOf:BASELINE_SIM.results[selectedYear].dscr??0,
+      min:0,axisTitle:'Annual DSCR (×)',stroke:'#98580a',baselineStroke:'#e0d1ba',threshold:D.minDSCR,
+      tickFormat:v=>v.toFixed(1),tooltipFormat:v=>`${v.toFixed(2)}× annual projection`
     });
   }
 
   function sparklineSvg(comp) {
-    const years=D.years;
-    const vals=years.map(y=>sim.results[y].components[comp].poor*100);
+    const times=Array.from({length:65},(_,i)=>FIRST_YEAR+i*.25);
+    const current=times.map(t=>physicalBridge.atTime(comp,Math.min(t,LAST_YEAR+.999)).poor*100);
+    const baseline=times.map(t=>BASELINE_PHYSICAL.atTime(comp,Math.min(t,LAST_YEAR+.999)).poor*100);
     const width=300,height=66,left=4,right=4,top=7,bottom=14;
-    const max=100,min=0;
-    const x=y=>left+(y-years[0])/(years[years.length-1]-years[0])*(width-left-right);
-    const yy=v=>top+(height-top-bottom)*(1-(v-min)/(max-min));
-    const pts=years.map((yr,i)=>`${x(yr)},${yy(vals[i])}`).join(' ');
-    const sx=x(selectedYear), sy=yy(vals[years.indexOf(selectedYear)]);
-    return `<svg class="spark" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Poor probability trend">
+    const x=t=>left+(t-FIRST_YEAR)/(LAST_YEAR+1-FIRST_YEAR)*(width-left-right);
+    const yy=v=>top+(height-top-bottom)*(1-v/100);
+    const line=v=>times.map((t,i)=>`${x(t)},${yy(v[i])}`).join(' ');
+    const t=smoothTime();
+    const currentNow=physicalBridge.atTime(comp,t).poor*100;
+    const baselineNow=BASELINE_PHYSICAL.atTime(comp,t).poor*100;
+    const sx=x(t);
+    return `<svg class="spark" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Baseline versus scenario Poor probability trend">
       <line x1="${left}" y1="${yy(50)}" x2="${width-right}" y2="${yy(50)}" stroke="#eef1f5" stroke-width="1" />
-      <polyline points="${pts}" fill="none" stroke="#c23b3b" stroke-width="2" vector-effect="non-scaling-stroke" />
+      <polyline points="${line(baseline)}" fill="none" stroke="#e4b7b7" stroke-width="2.4" stroke-dasharray="5 4" vector-effect="non-scaling-stroke" />
+      <polyline points="${line(current)}" fill="none" stroke="#c23b3b" stroke-width="2.7" vector-effect="non-scaling-stroke" />
       <line x1="${sx}" y1="${top}" x2="${sx}" y2="${height-bottom}" stroke="#b7bec8" stroke-dasharray="3 3" />
-      <circle cx="${sx}" cy="${sy}" r="3.4" fill="#c23b3b" />
+      <circle cx="${sx}" cy="${yy(baselineNow)}" r="3" fill="#fff" stroke="#dba8a8" stroke-width="2" />
+      <circle cx="${sx}" cy="${yy(currentNow)}" r="3.7" fill="#c23b3b" />
       <text x="${left}" y="${height-2}" font-size="8.5" fill="#7b8490">2010</text>
       <text x="${width-right}" y="${height-2}" font-size="8.5" text-anchor="end" fill="#7b8490">2025</text>
-      <text x="${width-right}" y="${top+8}" font-size="8.5" text-anchor="end" fill="#7b8490">Poor probability</text>
+      <text x="${width-right}" y="${top+8}" font-size="8.5" text-anchor="end" fill="#7b8490">Poor · Baseline / Scenario</text>
     </svg>`;
   }
 
   function physicalCardHtml(comp) {
-    const s = sim.results[selectedYear].components[comp];
-    const label = C.COMPONENT_LABELS[comp];
-    const stateStatus = s.construction
-      ? `In progress: ${escapeHtml(s.construction.label)} → target ${s.construction.target}; completion ${escapeHtml(C.formatTime(s.construction.endTime))}`
+    const t=smoothTime();
+    const s=physicalBridge.atTime(comp,t);
+    const base=BASELINE_PHYSICAL.atTime(comp,t);
+    const label=C.COMPONENT_LABELS[comp];
+    const changed=Math.abs(base.poor-s.poor)>1e-7 || base.map!==s.map || Boolean(s.construction);
+    const stateStatus=s.construction
+      ? `In progress: ${escapeHtml(s.construction.label)} → rating ${s.construction.target}; completion ${escapeHtml(C.formatTime(s.construction.endTime))}`
       : `Recommendation: ${escapeHtml(s.recommendationLabel)}`;
-    const exact = D.ratings.map((rating, i) => {
-      return `<div class="exact-cell"><div class="r">R${rating}</div><div class="p">${(s.dist[i]*100).toFixed(1)}%</div></div>`;
-    }).join('');
-    const unresolved = s.unresolved > 0.00005 ? ` · Unresolved Poor ${(s.unresolved*100).toFixed(2)}%` : '';
-    return `<div class="phys-card">
-      <div class="phys-top"><span>${escapeHtml(label)}</span><span class="rating ${ratingClass(s.map)}">MAP ${s.map}</span></div>
+    const exact=D.ratings.map((rating,i)=>`<div class="exact-cell"><div class="r">R${rating}</div><div class="p">${(s.dist[i]*100).toFixed(1)}%</div></div>`).join('');
+    const unresolved=s.unresolved>0.00005?` · Unresolved Poor ${(s.unresolved*100).toFixed(2)}%`:'';
+    const bars=state=>`<div class="good" style="width:${(state.good*100).toFixed(4)}%"></div><div class="fair" style="width:${(state.fair*100).toFixed(4)}%"></div><div class="poor" style="width:${(state.poor*100).toFixed(4)}%"></div>`;
+    return `<div class="phys-card ${changed?'changed':''}">
+      <div class="phys-top"><span>${escapeHtml(label)}</span><span class="rating ${ratingClass(s.map)}">Scenario MAP ${s.map}</span></div>
       <div class="phys-status">${stateStatus}</div>
-      <div class="probbar" title="Good / Fair / Poor">
-        <div class="good" style="width:${(s.good*100).toFixed(4)}%"></div>
-        <div class="fair" style="width:${(s.fair*100).toFixed(4)}%"></div>
-        <div class="poor" style="width:${(s.poor*100).toFixed(4)}%"></div>
-      </div>
+      <div class="compare-bar-label"><span>Baseline · MAP ${base.map}</span><span>Poor ${(base.poor*100).toFixed(2)}%</span></div>
+      <div class="probbar muted" title="Baseline Good / Fair / Poor">${bars(base)}</div>
+      <div class="compare-bar-label current"><span>Scenario · MAP ${s.map}</span><span>Poor ${(s.poor*100).toFixed(2)}%</span></div>
+      <div class="probbar" title="Scenario Good / Fair / Poor">${bars(s)}</div>
       <div class="probtxt"><div>Good ${(s.good*100).toFixed(1)}%</div><div>Fair ${(s.fair*100).toFixed(1)}%</div><div>Poor ${(s.poor*100).toFixed(1)}%</div></div>
+      <div class="physical-compare-summary"><span>Baseline Good/Fair/Poor ${(base.good*100).toFixed(1)}/${(base.fair*100).toFixed(1)}/${(base.poor*100).toFixed(1)}%</span><strong>${compareDelta(base.poor*100,s.poor*100,v=>v.toFixed(2)+'pp')} Poor</strong></div>
       <div class="exact-grid">${exact}</div>
-      <div class="map">Most likely exact rating: <strong>${s.map}</strong> (${(s.mapProbability*100).toFixed(1)}%)${unresolved}</div>
+      <div class="map">Scenario most likely exact rating: <strong>${s.map}</strong> (${(s.mapProbability*100).toFixed(1)}%)${unresolved}</div>
       ${sparklineSvg(comp)}
     </div>`;
   }
 
   function renderPhysical() {
-    $('physicalCards').innerHTML = C.COMPONENTS.map(physicalCardHtml).join('');
-    const inProgress = C.COMPONENTS
-      .map(c => ({c, s:sim.results[2025].components[c]}))
-      .filter(x => x.s.construction);
-    let note = 'Physical state starts at 2010 = 5/5/5. Without construction, each component advances using its local 2-year Markov matrix. An intervention freezes the component during construction, then resets it to the target rating at completion.';
-    if (inProgress.length) {
-      note += ' At the 2025 terminal state: ' + inProgress.map(x => `${C.COMPONENT_LABELS[x.c]} remains In Progress beyond the horizon`).join('; ') + '.';
-    }
-    $('physicalFootnote').textContent = note;
+    $('physicalCards').innerHTML=C.COMPONENTS.map(physicalCardHtml).join('');
+    const ongoing=C.COMPONENTS.filter(c=>physicalBridge.atTime(c,smoothTime()).construction);
+    let note=`Date ${isoDay(playbackDay)}: light Baseline is fixed (no maintenance); dark Scenario reflects applied repairs and their completion. Both use the identical 2-year Markov P and assumed in-between time-inhomogeneous CTMC probability path. Daily/weekly states are NOT observed inspections or separately validated daily forecasts.`;
+    if(ongoing.length)note+=' Construction in progress: '+ongoing.map(c=>C.COMPONENT_LABELS[c]).join(', ')+'. States reset at simulated completion.';
+    $('physicalFootnote').textContent=note;
   }
 
+  // The live chart uses actual/corrected embedded daily data and the historical
+  // toll schedule. Annual debt-service accounting is intentionally NOT
+  // redefined at daily frequency. No live network data is retrieved.
+  function moneyUSD(v){
+    return v===null||!Number.isFinite(v)?'—':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(v);
+  }
+  function rollingObservation(day,period,mode='baseline'){
+    if(day<0)return null;
+    let traffic=0,revenue=0,available=0;
+    for(let i=Math.max(0,day-period+1);i<=day;i++){
+      const rec=DAILY[i];
+      if(!rec||rec.traffic===null)continue;
+      const factor=mode==='scenario' ? 1-sim.results[Number(rec.date.slice(0,4))].trafficLoss : 1;
+      traffic+=rec.traffic*factor;
+      revenue+=rec.revenue*factor;
+      available++;
+    }
+    return available?{traffic,revenue,available}:null;
+  }
+  function playbackDelay(){
+    const speed=Number($('playbackSpeed').value)||2;
+    const period=Number($('playbackStep').value)||7;
+    return Math.max(22,Math.round((period===1?160:220)/speed));
+  }
+  function renderPlayback(){
+    const dayISO=isoDay(playbackDay);
+    $('playbackYear').textContent=dayISO;
+    const scrub=$('playbackScrub');
+    scrub.value=String(playbackDay);
+    scrub.style.setProperty('--playback-progress',`${playbackDay/LAST_DAY*100}%`);
+    $('playbackPlay').textContent=playbackRunning?'❚❚ Pause':(playbackDay===LAST_DAY?'↻ Replay':'▶ Play');
+    $('playbackPlay').setAttribute('aria-pressed',String(playbackRunning));
+    const step=Number($('playbackStep').value)||7;
+    $('playbackPrev').disabled=playbackDay<=0;
+    $('playbackNext').disabled=playbackDay>=LAST_DAY;
+    $('timelinePanel').classList.toggle('playing',playbackRunning);
+    $('playbackHint').textContent=playbackRunning
+      ? 'Decisions activate one calendar month after the recorded choice. Cash and debt change on the effective day; annual DSCR updates on activation. Play never sends Sepolia transactions.'
+      : playbackDay===LAST_DAY
+        ? 'End of 2010–2025 historical replay. Replay to return to 2010. No blockchain operations are triggered.'
+        : 'Choose Daily or Weekly and press Play. Submit decisions on any displayed date; effects start one calendar month later. Annual DSCR remains a full-year projection.';
+    const t=smoothTime();
+    for(const [comp,cap] of [['deck','Deck'],['super','Super'],['sub','Sub']]){
+      const physical=physicalBridge.atTime(comp,t);
+      const baseline=BASELINE_PHYSICAL.atTime(comp,t);
+      const el=document.querySelector(`[data-play-component="${comp}"]`);
+      const dist=el.querySelector('.playback-dist:not(.muted)');
+      const baseDist=el.querySelector('.playback-dist.muted');
+      baseDist.querySelector('.g').style.width=`${(baseline.good*100).toFixed(3)}%`;
+      baseDist.querySelector('.f').style.width=`${(baseline.fair*100).toFixed(3)}%`;
+      baseDist.querySelector('.p').style.width=`${(baseline.poor*100).toFixed(3)}%`;
+      $(`playback${cap}Base`).textContent=`Baseline MAP ${baseline.map} · Poor ${(baseline.poor*100).toFixed(2)}%`;
+      dist.querySelector('.g').style.width=`${Math.max(0,Math.min(100,physical.good*100))}%`;
+      dist.querySelector('.f').style.width=`${Math.max(0,Math.min(100,physical.fair*100))}%`;
+      dist.querySelector('.p').style.width=`${Math.max(0,Math.min(100,physical.poor*100))}%`;
+      const map=$(`playback${cap}Map`);
+      map.textContent=`MAP ${physical.map}`;
+      map.className='playback-map '+ratingClass(physical.map);
+      $(`playback${cap}State`).textContent=physical.construction?'Under construction':physical.map>=7?'Good':physical.map>=5?'Fair':'Poor';
+      $(`playback${cap}Poor`).textContent=`Poor ${(physical.poor*100).toFixed(2)}%`;
+    }
+    const r=sim.results[selectedYear];
+    $('playbackDscr').textContent=r.dscr===null?'N/A':`${r.dscr.toFixed(2)}×`;
+    $('playbackDscr').classList.toggle('fail',r.dscr!==null&&r.dscr<D.minDSCR);
+    const b=BASELINE_SIM.results[selectedYear];
+    const aNow=asOfFinancial(sim),bNow=asOfFinancial(BASELINE_SIM);
+    $('playbackFinanceBase').textContent=`Baseline annual DSCR ${b.dscr===null?'N/A':b.dscr.toFixed(2)+'×'} · as-of cash ${money(bNow.cash,1)}`;
+    $('playbackCash').textContent=`As-of cash ${money(aNow.cash,1)} · Principal ${money(aNow.principal,1)} · ${selectedYear} annual projection`;
+    const active=C.COMPONENTS.filter(c=>physicalBridge.atTime(c,t).construction);
+    let message=active.length?`Repair in progress: ${active.map(c=>C.COMPONENT_LABELS[c]).join(', ')}.`:
+      'Natural deterioration follows a continuous-time probability bridge anchored to original 2-year Markov checkpoints.';
+    if(r.chainProceeds>0)message+=` ${selectedYear}: confirmed Sepolia issuance ${money(r.chainProceeds,2)} (research assumption).`;
+    if(r.dscr!==null&&r.dscr<D.minDSCR)message+=` Annual DSCR below ${D.minDSCR.toFixed(2)}×.`;
+    $('playbackNarrative').textContent=`${dayISO} · ${message}`;
+  }
+  function renderRealtime(){
+    renderPlayback();
+    renderKPIs();
+    renderTrafficRevenueChart();
+    renderFinancialCharts();
+    renderAsOfStrip();
+    renderPhysical();
+    renderDecisionPanel();
+  }
+  function cancelPlaybackTimer(){
+    if(playbackTimer!==null)window.clearTimeout(playbackTimer);
+    playbackTimer=null;
+  }
+  function pausePlayback(){
+    cancelPlaybackTimer();
+    if(!playbackRunning)return;
+    playbackRunning=false;
+    renderRealtime();
+    renderDecisionPanel();
+    if(window.SingleBondWallet?.refreshUI)window.SingleBondWallet.refreshUI();
+  }
+  function setPlaybackDay(nextDay,{pause=true}={}){
+    if(pause)pausePlayback();
+    const previousYear=selectedYear;
+    playbackDay=Math.max(0,Math.min(LAST_DAY,Math.round(nextDay)));
+    selectedYear=yearFromDay(playbackDay);
+    const changed=refreshScenario();
+    if(selectedYear!==previousYear||changed)renderAll();
+    else renderRealtime();
+  }
+  function playbackTick(){
+    if(!playbackRunning)return;
+    if(playbackDay>=LAST_DAY){pausePlayback();return;}
+    const step=Number($('playbackStep').value)||7;
+    setPlaybackDay(Math.min(LAST_DAY,playbackDay+step),{pause:false});
+    if(playbackDay>=LAST_DAY){pausePlayback();return;}
+    playbackTimer=window.setTimeout(playbackTick,playbackDelay());
+  }
+  function startPlayback(){
+    if(playbackRunning)return;
+    if(window.SingleBondWallet?.getState()?.busy){
+      $('playbackHint').textContent='A MetaMask transaction or sync is in progress. Finish before starting playback.';
+      return;
+    }
+    if(playbackDay>=LAST_DAY){playbackDay=0;selectedYear=FIRST_YEAR;}
+    playbackRunning=true;
+    renderAll();
+    if(window.SingleBondWallet?.refreshUI)window.SingleBondWallet.refreshUI();
+    playbackTimer=window.setTimeout(playbackTick,playbackDelay());
+  }
+  function jumpToYear(year){
+    if(!Number.isInteger(year)||year<FIRST_YEAR||year>LAST_YEAR)return;
+    setPlaybackDay(dayFromYear(year));
+  }
+  $('playbackPlay').addEventListener('click',()=>playbackRunning?pausePlayback():startPlayback());
+  $('playbackRestart').addEventListener('click',()=>setPlaybackDay(0));
+  $('playbackPrev').addEventListener('click',()=>setPlaybackDay(playbackDay-(Number($('playbackStep').value)||7)));
+  $('playbackNext').addEventListener('click',()=>setPlaybackDay(playbackDay+(Number($('playbackStep').value)||7)));
+  $('playbackScrub').max=String(LAST_DAY);
+  $('playbackScrub').addEventListener('input',()=>setPlaybackDay(Number($('playbackScrub').value)));
+  $('playbackStep').addEventListener('change',()=>{
+    if(playbackRunning){cancelPlaybackTimer();playbackTimer=window.setTimeout(playbackTick,playbackDelay());}
+    renderRealtime();
+  });
+  $('playbackSpeed').addEventListener('change',()=>{
+    if(playbackRunning){cancelPlaybackTimer();playbackTimer=window.setTimeout(playbackTick,playbackDelay());}
+  });
+  // Do not pause on visibilitychange: MetaMask may open over the browser.
+  window.SimulatorPlayback={
+    isPlaying:()=>playbackRunning,
+    currentYear:()=>selectedYear,
+    currentDate:()=>isoDay(playbackDay),
+    currentDecisionDate:()=>formDecisionDate(),
+    play:startPlayback,pause:pausePlayback,
+    goTo:jumpToYear,
+    goToDate:date=>{
+      if(!/^20\d{2}-\d{2}-\d{2}$/.test(date))return;
+      const ms=Date.parse(date+'T00:00:00Z');
+      if(Number.isFinite(ms))setPlaybackDay(Math.round((ms-START_DATE_MS)/DAY_MS));
+    },
+    inspectAt:(comp,date)=>{
+      const ms=Date.parse(date+'T00:00:00Z');
+      return physicalBridge.atTime(comp,ContinuousPhysical.utcYearFraction(new Date(ms)));
+    },
+    inspectBaselineAt:(comp,date)=>{
+      const ms=Date.parse(date+'T00:00:00Z');
+      return BASELINE_PHYSICAL.atTime(comp,ContinuousPhysical.utcYearFraction(new Date(ms)));
+    },
+    getAsOfFinancials:()=>({scenario:asOfFinancial(sim),baseline:asOfFinancial(BASELINE_SIM)}),
+    generatorAt:(comp,date)=>{
+      const ms=Date.parse(date+'T00:00:00Z');
+      return physicalBridge.generatorAt(comp,ContinuousPhysical.utcYearFraction(new Date(ms)));
+    },
+    dailyData:()=>({date:isoDay(playbackDay),...rollingObservation(playbackDay,Number($('playbackStep').value)||7)})
+  };
+
   function renderAll() {
+    refreshScenario();
+    physicalBridge=ContinuousPhysical.build(sim);
+    renderComparisonStatus();
+    renderPlayback();
     renderTimeline();
     renderDecisionPanel();
     renderKPIs();
     renderTrafficRevenueChart();
     renderFinancialCharts();
+    renderAsOfStrip();
     renderPhysical();
+    renderSingleChainLedger();
   }
 
   function readAction(comp) {
     return $(COMP_IDS[comp].select).value;
   }
+  for(const comp of C.COMPONENTS){
+    const select=$(COMP_IDS[comp].select);
+    select.addEventListener('pointerdown',holdDecisionDate);
+    select.addEventListener('focus',holdDecisionDate);
+    select.addEventListener('change',()=>{
+      holdDecisionDate();
+      const date=formDecisionDate();
+      if(!enteredActionByDate[date])enteredActionByDate[date]={deck:'none',super:'none',sub:'none'};
+      enteredActionByDate[date][comp]=select.value;
+    });
+  }
+  $('decisionUseLiveDate').addEventListener('click',()=>{
+    if(window.SingleBondWallet?.getState()?.busy)return;
+    releaseDecisionDate();
+    renderAll();
+    setMessage(`Decision editor returned to live playback date ${decisionDateNow()}. Play was not paused.`,'');
+  });
 
-  function validateCurrentForm() {
-    if (selectedYear === 2025) return { ok:false, message:'2025 is the terminal state; no decision can be entered.' };
-    const r=sim.results[selectedYear];
-    for (const comp of C.COMPONENTS) {
-      const choice=readAction(comp);
-      const s=r.components[comp];
-      if (s.construction && choice !== 'none') {
-        return {ok:false,message:`${C.COMPONENT_LABELS[comp]} is already under construction. Select No Action.`};
-      }
-      if (choice !== 'none' && choice !== s.recommendationKey) {
-        return {ok:false,message:`${C.COMPONENT_LABELS[comp]} MAP ${s.map}: only ${s.recommendationLabel} or No Action is allowed in the current version.`};
+  function validateCurrentForm(choices){
+    if(!actionableNow())return {ok:false,message:'Activation is outside 2010–2025. Select a decision date on or before 2025-11-30.'};
+    const date=formDecisionDate(),candidates=[];
+    for(const comp of C.COMPONENTS){
+      const choice=choices[comp]||'none';
+      if(choice==='none')continue;
+      const state=physicalBridge.atTime(comp,timeForISO(date));
+      const pending=pendingForComponent(comp,date);
+      if(pending||state.construction)return {ok:false,message:`${C.COMPONENT_LABELS[comp]} already has an ongoing or pending repair. Existing job finishes ${pending?.endDate||'after current construction'}.`};
+      if(choice!==state.recommendationKey)return {ok:false,message:`${C.COMPONENT_LABELS[comp]}: at ${date}, MAP ${state.map} permits only ${state.recommendationLabel} or No Action.`};
+      const action=C.makeDatedIntervention(comp,date,state.map);
+      if(!action||action.key!==choice)return {ok:false,message:`Invalid ${comp} action.`};
+      if(scheduledActions.some(a=>a.component===comp &&
+        action.effectiveDate<a.endDate && action.endDate>a.effectiveDate))
+        return {ok:false,message:`Another ${comp} repair overlaps the selected implementation interval.`};
+      candidates.push(action);
+    }
+    if(!candidates.length)return {ok:false,message:'Select at least one recommended bridge repair before scheduling.'};
+    const forecast=C.simulateDated(decisions,chainIssues,[...scheduledActions,...candidates]);
+    const minYr=Number(effectiveDateNow().slice(0,4));
+    const maxYr=Math.min(LAST_YEAR,Math.max(...candidates.map(x=>Number(addDaysISOForUI(x.endDate,-1).slice(0,4)))));
+    for(let yr=minYr;yr<=maxYr;yr++){
+      const r=forecast.results[yr];
+      if(r && (r.cashEnd< -1e-9||(r.dscr!==null&&r.dscr<D.minDSCR-1e-9)))
+        return {ok:false,message:`Scheduled repair fails ${yr} financial feasibility: projected cash ${money(r.cashEnd,2)}, annual DSCR ${r.dscr===null?'N/A':r.dscr.toFixed(3)+'×'}. No repair was scheduled.`};
+    }
+    // A positive year-end balance is insufficient if cash temporarily goes
+    // negative during the project. Check the modeled daily ledger as well.
+    for(const a of candidates){
+      let current=a.effectiveDate;
+      while(current<=MODEL_LAST_ISO && current<a.endDate){
+        const cash=forecast.dailyLedger?.[current]?.cash;
+        if(Number.isFinite(cash)&&cash< -1e-9)
+          return {ok:false,message:`Scheduled repair creates a negative daily cash balance (${money(cash,2)} on ${current}). No repair was scheduled.`};
+        current=addDaysISOForUI(current,1);
       }
     }
-    if (bondIssueMode) {
-      const v=Number($('bondAmount').value);
-      if (!Number.isFinite(v) || v < 0) return {ok:false,message:'Bond amount must be a non-negative number.'};
+    return {ok:true,candidates};
+  }
+  // For cross-year interventions, evaluate financial capacity in all affected years.
+  function addDaysISOForUI(date,offset){
+    return new Date(Date.parse(date+'T00:00:00Z')+offset*DAY_MS).toISOString().slice(0,10);
+  }
+  $('bondAmount').addEventListener('focus',holdDecisionDate);
+  $('bondAmount').addEventListener('pointerdown',holdDecisionDate);
+  $('bondAmount').addEventListener('input',()=>{
+    holdDecisionDate();
+    enteredAmountByYear[formDecisionYear()]=$('bondAmount').value;
+  });
+  $('bondYes').addEventListener('click',async()=>{
+    holdDecisionDate();
+    const date=formDecisionDate(),effective=C.addCalendarMonthISO(date);
+    const amountText=$('bondAmount').value;
+    if(!actionableNow()){setMessage('Bond activation would occur after 2025; no on-chain mint was requested.','error');return;}
+    const amount=Number(amountText);
+    if(!(Number.isFinite(amount)&&amount>0&&amount<=1e12)){
+      setMessage('Enter a positive bond amount in $ millions.','error');return;
     }
-    return {ok:true};
+    if(!window.SingleBondWallet){setMessage('Sepolia wallet module is not initialized. Reload the page.','error');return;}
+    $('bondYes').disabled=true;
+    setMessage(`Confirming a real Sepolia token mint now; financial recognition is scheduled for ${effective}.`,'warning');
+    try{
+      const ev=await window.SingleBondWallet.issueBond(amountText,date);
+      releaseDecisionDate();refreshScenario();renderAll();
+      setMessage(`Sepolia transaction confirmed: ${money(ev.principalM,3)} minted now. Accounting effective ${effective}; Play continued throughout. Tx: ${ev.txHash.slice(0,14)}…`,'success');
+    }catch(e){$('bondYes').disabled=false;setMessage(window.SingleBondWallet.explainError(e),'error');}
+  });
+  $('bondNo').addEventListener('click',()=>{
+    holdDecisionDate();
+    const year=formDecisionYear();
+    if(year===LAST_YEAR)return;
+    decisions[year].bondAmount=0;
+    refreshScenario();renderAll();
+    setMessage(`Legacy ${year+1}-01-01 mock issuance changed to $0. Play continues. This does not cancel any Sepolia transaction or dated repair.`,'success');
+  });
+  $('applyBtn').addEventListener('click',()=>{
+    holdDecisionDate();
+    const date=formDecisionDate(),effective=effectiveDateNow();
+    const choices=Object.fromEntries(C.COMPONENTS.map(comp=>[comp,readAction(comp)]));
+    const v=validateCurrentForm(choices);
+    if(!v.ok){setMessage(v.message,'error');return;}
+    scheduledActions.push(...v.candidates);
+    delete enteredActionByDate[date];
+    releaseDecisionDate();refreshScenario();renderAll();
+    setMessage(`${v.candidates.map(x=>x.componentLabel+' '+x.label).join(' + ')} decided on ${date}. Starts ${effective}; physical/financial effects wait one month. Playback was not paused. No on-chain token was minted.`,'success');
+  });
+  $('resetBtn').addEventListener('click',()=>{
+    releaseDecisionDate();
+    decisions=C.createBaselineDecisions();
+    scheduledActions=[];
+    for(const key of Object.keys(enteredAmountByYear))delete enteredAmountByYear[key];
+    for(const key of Object.keys(enteredActionByDate))delete enteredActionByDate[key];
+    scenarioSignature=null;
+    selectedYear=FIRST_YEAR;playbackDay=0;
+    refreshScenario();renderAll();
+    setMessage('Simulated repairs and mock overrides reset. Playback continues from 2010 if it was running. Confirmed Sepolia mints remain immutable and will be recognized at their stored effective dates.','success');
+  });
+  function renderSingleChainLedger(){
+    const el=$('singleIssueRows');
+    el.replaceChildren();
+    if(!chainIssues.length){
+      const tr=document.createElement('tr'),td=document.createElement('td');
+      td.colSpan=5;td.textContent='No confirmed on-chain bond issuance for the loaded contract.';
+      tr.appendChild(td);el.appendChild(tr);return;
+    }
+    for(const ev of chainIssues.slice().sort((a,b)=>(Number(a.modelYear)-Number(b.modelYear)) || a.txHash.localeCompare(b.txHash))){
+      const tr=document.createElement('tr');
+      const vals=[`${ev.modelDecisionDate||ev.modelYear+' (year-only)'} → ${issueActiveDate(ev)}`,
+        '$'+Number(ev.principalM).toLocaleString('en-US',{maximumFractionDigits:6})+'M',
+        (Number(ev.couponBps)/100).toFixed(2)+'%',String(ev.maturityYear)];
+      for(const value of vals){const td=document.createElement('td');td.textContent=value;tr.appendChild(td);}
+      const td=document.createElement('td'),a=document.createElement('a');
+      a.href='https://sepolia.etherscan.io/tx/'+ev.txHash;
+      a.target='_blank';a.rel='noopener noreferrer';
+      a.textContent=ev.txHash.slice(0,10)+'…'+ev.txHash.slice(-6);
+      td.appendChild(a);tr.appendChild(td);el.appendChild(tr);
+    }
   }
 
-  $('bondYes').addEventListener('click', () => {
-    if (selectedYear === 2025) return;
-    bondIssueMode=true;
-    $('bondYes').classList.add('active');
-    $('bondNo').classList.remove('active');
-    $('bondAmount').disabled=false;
-    if (Number($('bondAmount').value) <= 0) $('bondAmount').value=String(D.baselineDecisionIssue);
-  });
-  $('bondNo').addEventListener('click', () => {
-    if (selectedYear === 2025) return;
-    bondIssueMode=false;
-    $('bondNo').classList.add('active');
-    $('bondYes').classList.remove('active');
-    $('bondAmount').disabled=true;
-  });
-
-  $('applyBtn').addEventListener('click', () => {
-    const v=validateCurrentForm();
-    if(!v.ok){ setMessage(v.message,'error'); return; }
-    const d=decisions[selectedYear];
-    d.bondAmount=bondIssueMode ? Math.max(0,Number($('bondAmount').value)||0) : 0;
-    for(const comp of C.COMPONENTS) d.actions[comp]=readAction(comp);
-    sim=C.simulate(decisions);
-    renderAll();
-    const summary=executionSummaryForDecisionYear(selectedYear);
-    if(summary.type){ setMessage(summary.text,summary.type); }
-    else setMessage(`Decision saved for ${selectedYear}. It executes on Jan 1 ${selectedYear+1}; all subsequent trajectories were recalculated.`,'success');
-  });
-
-  $('resetBtn').addEventListener('click', () => {
-    decisions=C.createBaselineDecisions();
-    sim=C.simulate(decisions);
-    selectedYear=2024;
-    renderAll();
-    setMessage('Baseline restored: $25M bond decision each year (2010–2024), no repair actions.','success');
-  });
+  // Only the verified on-chain event decoder supplies these records in normal use.
+  // This bridge is intentionally local to the browser and does not edit MTA records.
+  window.BridgeFinance={
+    setConfirmedIssues(records){
+      const map=new Map();
+      for(const ev of records||[]){
+        if(!/^0x[a-fA-F0-9]{64}$/.test(ev.txHash||''))continue;
+        const y=Number(ev.modelYear),amount=Number(ev.principalM);
+        if(!Number.isInteger(y)||y<FIRST_YEAR||y>LAST_YEAR||!(Number.isFinite(amount)&&amount>0))continue;
+        let date=null;
+      if(typeof ev.modelDecisionDate==='string' && /^20\d{2}-\d{2}-\d{2}$/.test(ev.modelDecisionDate) &&
+         Number(ev.modelDecisionDate.slice(0,4))===y){
+        try{C.addCalendarMonthISO(ev.modelDecisionDate);date=ev.modelDecisionDate;}catch(_){}
+      }
+        const k=ev.txHash.toLowerCase()+':'+Number(ev.logIndex||0);
+        map.set(k,{...ev,modelYear:y,principalM:amount,modelDecisionDate:date});
+      }
+      chainIssues=Array.from(map.values());
+      refreshScenario();renderAll();
+    },
+    getFinancials:year=>({...sim.results[year]}),
+    getBaselineFinancials:year=>({...BASELINE_SIM.results[year]}),
+    getConfirmedIssues:()=>chainIssues.map(ev=>({...ev})),
+    getScheduledRepairs:()=>scheduledActions.map(a=>({...a})),
+    getFullScheduledProjection:year=>({...C.simulateDated(decisions,chainIssues,scheduledActions).results[year]}),
+    selectYear:year=>{if(D.years.includes(year))jumpToYear(year);}
+  };
 
   renderAll();
+})();
+
+</script>
+<script>
+'use strict';
+(() => {
+  // Browser-native EIP-1193, EIP-6963, and ABI calls. No CDN or server.
+  const CHAIN_ID='0xaa36a7'; // Sepolia, decimal 11155111.
+  const EXPLORER='https://sepolia.etherscan.io';
+  const LOCAL_KEY='pfd.sepolia.single.bond.address.v1';
+  const ISSUE_DATE_PREFIX='pfd.sepolia.single.bond.decision-date.v2:';
+  const issuanceDateCache=new Map();
+  const EVENT_TOPIC='0x122597f36f2b3e87f2211861ecd97530705521dc3760f7a73d1eb31f954da83f';
+  const SELECTOR={
+    version:'0xfb219320', coupon:'0x2bcc504a', maturity:'0xd59624b4',
+    maturityYears:'0xe84db521', deploymentBlock:'0x82100e3f',
+    owner:'0x8da5cb5b', name:'0x06fdde03', symbol:'0x95d89b41',
+    totalSupply:'0x18160ddd', decimals:'0x313ce567',
+    issue:'0x959055fb'
+  };
+  const SCALE_MILLION=10n**24n; // $1M x 1e18 ERC-20 base units.
+  const MAX_UINT256=(1n<<256n)-1n;
+  const $=id=>document.getElementById(id);
+  const state={provider:null, account:null, chainId:null, contract:null, busy:false,
+    events:[], connecting:false, lastTxHash:null};
+  const discovered=[];
+  let boundProvider=null;
+  const validAddress=x=>/^0x[0-9a-fA-F]{40}$/.test(x||'')&&!/^0x0{40}$/i.test(x||'');
+  const trunc=x=>x?x.slice(0,7)+'…'+x.slice(-4):'—';
+  const encodeUInt=x=>{
+    const n=BigInt(x);
+    if(n<0n||n>MAX_UINT256)throw Error('Invalid uint256');
+    return n.toString(16).padStart(64,'0');
+  };
+  const encodeAddr=x=>{
+    if(!validAddress(x))throw Error('Invalid recipient address.');
+    return x.slice(2).toLowerCase().padStart(64,'0');
+  };
+  const uintFrom=hex=>BigInt(hex||'0x0');
+  const addrFrom=hex=>'0x'+hex.slice(-40);
+  const rpc=(method,params=[])=>{
+    if(!state.provider)throw Error('MetaMask not connected.');
+    return state.provider.request({method,params});
+  };
+  const sleep=ms=>new Promise(done=>setTimeout(done,ms));
+  function setStatus(message,type=''){
+    const n=$('singleNotice');
+    n.className='chain-notice'+(type?' '+type:'');
+    n.textContent=message;
+  }
+  function explainError(e){
+    const code=Number(e?.code);
+    const message=String(e?.shortMessage||e?.message||e||'Unknown error');
+    if(code===4001||/user denied|user rejected|rejected the request/i.test(message))return 'MetaMask request was rejected. No bond was issued.';
+    if(code===-32002)return 'A MetaMask request is already pending. Open MetaMask and finish that request.';
+    if(/insufficient funds/i.test(message))return 'Insufficient Sepolia test ETH to pay transaction gas.';
+    if(/onlyowner|ownableunauthorizedaccount|unauthorized/i.test(message))return 'Only the wallet that deployed this bond token may issue it.';
+    if(/matured|maturity/i.test(message))return 'The bond has reached maturity (or has an invalid maturity for this model year).';
+    if(/execution reverted|revert/i.test(message))return 'Transaction reverted: check owner, amount and maturity in the contract.';
+    return message.length>350?message.slice(0,350)+'…':message;
+  }
+  function issueDateKey(txHash){return ISSUE_DATE_PREFIX+txHash.toLowerCase();}
+  function rememberIssueDate(txHash,date){
+    if(!/^0x[a-f0-9]{64}$/i.test(txHash)||!/^20\d{2}-\d{2}-\d{2}$/.test(date))return;
+    issuanceDateCache.set(txHash.toLowerCase(),date);
+    try{localStorage.setItem(issueDateKey(txHash),date);}catch(_){}
+  }
+  function recordedIssueDate(txHash,modelYear){
+    let date=issuanceDateCache.get(txHash.toLowerCase());
+    if(!date){try{date=localStorage.getItem(issueDateKey(txHash))||null;}catch(_){}}
+    return date && /^20\d{2}-\d{2}-\d{2}$/.test(date) &&
+      Number(date.slice(0,4))===Number(modelYear)?date:null;
+  }
+  function saveAddress(address){
+    try {localStorage.setItem(LOCAL_KEY,address);}catch(_){}
+  }
+  function savedAddress(){
+    try {return localStorage.getItem(LOCAL_KEY)||'';}catch(_){return '';}
+  }
+  function updateMobileLink(){
+    const el=$('singleMobileLink');
+    const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+    el.hidden=!!state.provider||!mobile||!/^https?:$/.test(location.protocol);
+    if(!el.hidden){el.href='https://link.metamask.io/dapp/'+location.host+location.pathname+location.search;}
+  }
+  function updateUI(){
+    const walletReady=!!state.account;
+    const correctChain=walletReady&&String(state.chainId).toLowerCase()===CHAIN_ID;
+    $('singleWallet').textContent=walletReady
+      ? 'Wallet: '+state.account+' · '+(correctChain?'Sepolia':'wrong network')
+      : 'Wallet: not connected';
+    $('singleConnect').textContent=walletReady?'Reconnect MetaMask':'Connect MetaMask';
+    $('singleConnect').disabled=state.busy;
+    $('singleSwitch').disabled=state.busy||!state.provider;
+    $('singleLoad').disabled=state.busy||!correctChain;
+    const c=state.contract;
+    $('singleCoupon').textContent=c?(c.couponBps/100).toFixed(2)+'%':'—';
+    $('singleMaturity').textContent=c?c.maturityDateText:'—';
+    $('singleSupply').textContent=c?'$'+c.supplyM.toLocaleString('en-US',{maximumFractionDigits:4})+'M':'—';
+    $('singleOwner').textContent=c?trunc(c.owner)+(c.owner.toLowerCase()===state.account?.toLowerCase()?' (you)':''):'—';
+    if(c){$('singleOwner').title=c.owner;}
+    const a=$('singleContractLink');
+    a.hidden=!c;
+    if(c){a.href=EXPLORER+'/address/'+c.address;a.textContent='Contract address: '+c.address+' (Etherscan)';}
+    const replayDate=window.SimulatorPlayback?.currentDecisionDate?.()||window.SimulatorPlayback?.currentDate?.()||'2010-01-01';
+    const canActivate=window.SimulatorCore?.addCalendarMonthISO(replayDate)<='2025-12-31';
+    $('bondYes').disabled=state.busy||!canActivate;
+    updateMobileLink();
+  }
+  function onAnnouncedProvider(ev){
+    const detail=ev?.detail,p=detail?.provider;
+    if(!p||typeof p.request!=='function')return;
+    const name=String(detail?.info?.name||'');
+    const rdns=String(detail?.info?.rdns||'');
+    if(rdns==='io.metamask'||/^MetaMask(?:$|\s)/i.test(name)){
+      if(!discovered.includes(p))discovered.push(p);
+    }
+  }
+  window.addEventListener('eip6963:announceProvider',onAnnouncedProvider);
+  window.dispatchEvent(new Event('eip6963:requestProvider'));
+  function findProvider(){
+    if(discovered.length)return discovered[0];
+    const e=window.ethereum;
+    if(!e)return null;
+    if(Array.isArray(e.providers))return e.providers.find(p=>p?.isMetaMask&&typeof p.request==='function')||null;
+    return e.isMetaMask&&typeof e.request==='function'?e:null;
+  }
+  async function discoverProvider(){
+    let p=findProvider();
+    if(p)return p;
+    window.dispatchEvent(new Event('eip6963:requestProvider'));
+    for(let i=0;i<11;i++){
+      await sleep(100);
+      p=findProvider();
+      if(p)return p;
+    }
+    return null;
+  }
+  function onWalletChanged(){
+    if(state.busy)return;
+    void syncWallet().catch(e=>setStatus(explainError(e),'warning'));
+  }
+  function bindProvider(p){
+    if(boundProvider===p)return;
+    if(boundProvider?.removeListener){
+      boundProvider.removeListener('accountsChanged',onWalletChanged);
+      boundProvider.removeListener('chainChanged',onWalletChanged);
+      boundProvider.removeListener('disconnect',onWalletChanged);
+    }
+    boundProvider=p;
+    if(p&&typeof p.on==='function'){
+      p.on('accountsChanged',onWalletChanged);
+      p.on('chainChanged',onWalletChanged);
+      p.on('disconnect',onWalletChanged);
+    }
+  }
+  async function syncWallet(){
+    const p=state.provider;
+    if(!p){state.account=null;state.chainId=null;updateUI();return;}
+    const [accounts,chain]=await Promise.all([rpc('eth_accounts'),rpc('eth_chainId')]);
+    state.account=Array.isArray(accounts)&&accounts.length?accounts[0]:null;
+    state.chainId=chain;
+    updateUI();
+  }
+  async function connect(){
+    if(state.busy)return;
+    state.busy=true;
+    setStatus('Looking for MetaMask...','warning');updateUI();
+    try{
+      const p=await discoverProvider();
+      if(!p)throw Error('MetaMask was not detected. Install the MetaMask extension or open this website inside MetaMask Mobile.');
+      state.provider=p;bindProvider(p);
+      const accounts=await rpc('eth_requestAccounts');
+      if(!accounts?.length)throw Error('MetaMask did not return an account.');
+      await syncWallet();
+      setStatus('MetaMask connected. Confirm Sepolia and load the ERC-20 contract address.','success');
+    }catch(e){setStatus(explainError(e),'error');}
+    finally{state.busy=false;updateUI();}
+  }
+  async function switchSepolia(){
+    if(state.busy)return;
+    state.busy=true;updateUI();
+    try{
+      if(!state.provider){
+        const p=await discoverProvider();
+        if(!p)throw Error('MetaMask not detected. Open this page in MetaMask browser.');
+        state.provider=p;bindProvider(p);
+      }
+      try {await rpc('wallet_switchEthereumChain',[{chainId:CHAIN_ID}]);}
+      catch(e){
+        if(Number(e?.code)===4902){
+          await rpc('wallet_addEthereumChain',[{chainId:CHAIN_ID,chainName:'Sepolia',nativeCurrency:{name:'Sepolia Ether',symbol:'ETH',decimals:18},rpcUrls:['https://ethereum-sepolia-rpc.publicnode.com'],blockExplorerUrls:[EXPLORER]}]);
+          await rpc('wallet_switchEthereumChain',[{chainId:CHAIN_ID}]);
+        }else throw e;
+      }
+      await syncWallet();
+      setStatus('Sepolia selected. Load the single ERC-20 bond contract.','success');
+    }catch(e){setStatus(explainError(e),'error');}
+    finally{state.busy=false;updateUI();}
+  }
+  function decodeString(hex){
+    try{
+      const text=hex.slice(2);
+      const offset=Number(BigInt('0x'+text.slice(0,64)))*2;
+      const count=Number(BigInt('0x'+text.slice(offset,offset+64)));
+      if(count>256||count<0)return '';
+      const raw=text.slice(offset+64,offset+64+count*2);
+      return new TextDecoder().decode(new Uint8Array(raw.match(/.{2}/g)?.map(x=>parseInt(x,16))||[]));
+    }catch(_){return '';}
+  }
+  function usdMFromRaw(amount){
+    const n=BigInt(amount);
+    const whole=n/SCALE_MILLION;
+    const frac=(n%SCALE_MILLION).toString().padStart(24,'0').slice(0,9);
+    const number=Number(whole.toString()+'.'+frac);
+    if(!Number.isFinite(number)||number>1e12)return null;
+    return number;
+  }
+  function parseMillion(amount){
+    const text=String(amount).trim();
+    // Decimal input is in $millions, not number of tokens.
+    if(!/^\d+(?:\.\d{1,12})?$/.test(text))throw Error('Enter an amount in $ millions (up to 12 decimals).');
+    const [i,f='']=text.split('.');
+    const value=BigInt(i)*SCALE_MILLION+BigInt((f+'0'.repeat(24)).slice(0,24));
+    if(value<=0n)throw Error('Bond principal must be positive.');
+    if(usdMFromRaw(value)===null)throw Error('Requested bond principal exceeds prototype limit.');
+    return value;
+  }
+  async function callUint(address,selector){return uintFrom(await rpc('eth_call',[{to:address,data:selector},'latest']));}
+  async function callString(address,selector){return decodeString(await rpc('eth_call',[{to:address,data:selector},'latest']));}
+  function decodeIssueLog(log,c){
+    if(!log||String(log.address||'').toLowerCase()!==c.address.toLowerCase()||String(log.topics?.[0]||'').toLowerCase()!==EVENT_TOPIC)return null;
+    if(log.topics.length!==3||!/^0x[0-9a-fA-F]{128}$/.test(log.data||''))return null;
+    const modelYear=Number(uintFrom(log.topics[2]));
+    const principal=BigInt('0x'+log.data.slice(2,66));
+    const chainTimestamp=Number(BigInt('0x'+log.data.slice(66,130)));
+    const principalM=usdMFromRaw(principal);
+    const txHash=String(log.transactionHash||'');
+    if(!/^0x[a-f0-9]{64}$/i.test(txHash)||!Number.isInteger(modelYear)||modelYear<2010||modelYear>2024||principalM===null||principalM<=0)return null;
+    const logIndex=Number(uintFrom(log.logIndex||'0x0'));
+    const recipient=addrFrom(log.topics[1]);
+    return {txHash,logIndex,principalM,modelYear,couponBps:c.couponBps,
+      maturityYear:c.maturityYear,maturityDate:c.maturityDateText,recipient,recordedAt:chainTimestamp,
+      modelDecisionDate:recordedIssueDate(txHash,modelYear),contractAddress:c.address};
+  }
+  function mergeEvents(incoming){
+    const map=new Map(state.events.map(e=>[e.txHash.toLowerCase()+':'+e.logIndex,e]));
+    for(const ev of incoming){map.set(ev.txHash.toLowerCase()+':'+ev.logIndex,ev);}
+    state.events=Array.from(map.values());
+    window.BridgeFinance.setConfirmedIssues(state.events);
+  }
+  async function readContract(address){
+    const code=await rpc('eth_getCode',[address,'latest']);
+    if(!code||code==='0x')throw Error('No deployed contract found at this address on Sepolia.');
+    const [version,ownerRaw,couponRaw,maturityRaw,yearsRaw,blockRaw,decimalsRaw,supplyRaw,name,symbol]=await Promise.all([
+      callUint(address,SELECTOR.version),rpc('eth_call',[{to:address,data:SELECTOR.owner},'latest']),
+      callUint(address,SELECTOR.coupon),callUint(address,SELECTOR.maturity),
+      callUint(address,SELECTOR.maturityYears),callUint(address,SELECTOR.deploymentBlock),
+      callUint(address,SELECTOR.decimals),callUint(address,SELECTOR.totalSupply),
+      callString(address,SELECTOR.name),callString(address,SELECTOR.symbol)]);
+    if(version!==1n)throw Error('The address is not a BridgeBondToken v1 contract. Deploy BridgeBondToken.sol, not the old Factory or BRT token.');
+    if(decimalsRaw!==18n)throw Error('Unsupported ERC-20 decimals (expected 18).');
+    const couponBps=Number(couponRaw),maturityTimestamp=Number(maturityRaw),deploymentBlock=Number(blockRaw);
+    if(couponBps>10000||!Number.isSafeInteger(deploymentBlock)||deploymentBlock<0||!Number.isFinite(maturityTimestamp))throw Error('Invalid on-chain bond metadata.');
+    const maturityDate=new Date(maturityTimestamp*1000);
+    if(Number.isNaN(maturityDate.getTime()))throw Error('Invalid maturity timestamp.');
+    return {address,owner:addrFrom(ownerRaw),couponBps,maturityTimestamp,
+      maturityYear:maturityDate.getUTCFullYear(),maturityDateText:maturityDate.toISOString().slice(0,10),
+      maturityYears:Number(yearsRaw),deploymentBlock,
+      supplyM:usdMFromRaw(supplyRaw)||0, name,symbol};
+  }
+  async function scanEvents(c){
+    const tip=Number(uintFrom(await rpc('eth_blockNumber')));
+    const logs=[];
+    const size=2500;
+    if(tip<c.deploymentBlock)return [];
+    for(let from=c.deploymentBlock;from<=tip;from+=size){
+      if(state.contract!==c)throw Error('Bond contract changed during event synchronization.');
+      const to=Math.min(tip,from+size-1);
+      setStatus(`Reading confirmed bond issuance events: blocks ${from.toLocaleString()}–${to.toLocaleString()} of ${tip.toLocaleString()}...`,'warning');
+      const batch=await rpc('eth_getLogs',[{address:c.address,fromBlock:'0x'+from.toString(16),toBlock:'0x'+to.toString(16),topics:[EVENT_TOPIC]}]);
+      if(!Array.isArray(batch))throw Error('Sepolia RPC returned an invalid event log response.');
+      logs.push(...batch);
+      if(logs.length>5000)throw Error('More than 5,000 issuance events. This browser prototype needs an event indexer for larger histories.');
+    }
+    return logs.map(log=>decodeIssueLog(log,c)).filter(Boolean);
+  }
+  async function loadBond(raw,{quiet=false}={}){
+    if(state.busy)return;
+    const address=String(raw||'').trim();
+    if(!validAddress(address)){setStatus('Enter a valid 0x... single ERC-20 contract address.','error');return;}
+    state.busy=true;updateUI();
+    try{
+      if(!state.account)throw Error('Connect MetaMask first.');
+      if(String(state.chainId).toLowerCase()!==CHAIN_ID)throw Error('Switch MetaMask to Sepolia first.');
+      const c=await readContract(address);
+      // In this version only ONE token contract is loaded at a time.
+      state.contract=c;
+      state.events=[];
+      window.BridgeFinance.setConfirmedIssues([]);
+      $('singleContractInput').value=address;
+      saveAddress(address);updateUI();
+      const events=await scanEvents(c);
+      mergeEvents(events);
+      if(!quiet)setStatus(`${c.symbol||'BRB'} loaded at ${address}. ${events.length} confirmed issuance records synchronized; choose amount and click Issue.`,'success');
+    }catch(e){
+      // A metadata-valid contract remains loaded even if only historical log scanning fails.
+      setStatus('Contract load/sync: '+explainError(e),'error');
+    }finally{state.busy=false;updateUI();}
+  }
+  async function receiptFor(txHash){
+    for(let i=0;i<120;i++){
+      const receipt=await rpc('eth_getTransactionReceipt',[txHash]);
+      if(receipt)return receipt;
+      await sleep(1000);
+    }
+    throw Error('Transaction was submitted but its receipt was not found within two minutes. Do NOT issue again until checking the transaction on Sepolia Etherscan. Transaction: '+txHash);
+  }
+  async function issueBond(amountMillions,modelDecisionDate){
+    if(!/^20\d{2}-\d{2}-\d{2}$/.test(modelDecisionDate))throw Error('Invalid simulation decision date.');
+    const modelDecisionYear=Number(modelDecisionDate.slice(0,4));
+    if(state.busy)throw Error('A wallet or blockchain operation is already running.');
+    if(!state.account||String(state.chainId).toLowerCase()!==CHAIN_ID)throw Error('Connect MetaMask to Sepolia before issuing.');
+    const c=state.contract;
+    if(!c)throw Error('Load the deployed BridgeBondToken contract address first.');
+    if(String($('singleContractInput').value||'').trim().toLowerCase()!==c.address.toLowerCase())throw Error('The address field has changed. Click Load bond to verify the contract before issuing.');
+    if(c.owner.toLowerCase()!==state.account.toLowerCase())throw Error('The connected account is not the bond contract owner. Connect the deployment wallet.');
+    if(!Number.isInteger(modelDecisionYear)||modelDecisionYear<2010||modelDecisionYear>2025)throw Error('Select a simulation decision date from 2010 to 2025.');
+    if(window.SimulatorCore.addCalendarMonthISO(modelDecisionDate)>'2025-12-31')throw Error('Effective date is beyond the 2025 model horizon.');
+    if(c.maturityTimestamp<=Math.floor(Date.now()/1000))throw Error('This bond has already matured on Sepolia.');
+    if(c.maturityDateText<=window.SimulatorCore.addCalendarMonthISO(modelDecisionDate))throw Error('Maturity must occur after the modeled effective date.');
+    const amount=parseMillion(amountMillions);
+    const data=SELECTOR.issue+encodeAddr(state.account)+encodeUInt(amount)+encodeUInt(modelDecisionYear);
+    state.busy=true;updateUI();
+    try{
+      setStatus('Approve ERC-20 issue() in MetaMask. No real dollars are transferred.','warning');
+      const txHash=await rpc('eth_sendTransaction',[{from:state.account,to:c.address,data}]);
+      if(!/^0x[a-f0-9]{64}$/i.test(txHash))throw Error('MetaMask returned an invalid transaction hash.');
+      state.lastTxHash=txHash;
+      // Persist this exact replay decision date as soon as the transaction hash
+      // is known, so a reload during confirmation cannot lose the mapping.
+      rememberIssueDate(txHash,modelDecisionDate);
+      setStatus(`Transaction sent: ${trunc(txHash)}. Waiting for the Sepolia receipt; do not click Issue again.`,'warning');
+      const receipt=await receiptFor(txHash);
+      if(uintFrom(receipt.status||'0x0')!==1n)throw Error('The Sepolia transaction reverted. No bond issue was recorded. Tx: '+txHash);
+      const matches=(receipt.logs||[]).map(l=>decodeIssueLog(l,c)).filter(Boolean);
+      const ev=matches.find(e=>e.txHash.toLowerCase()===txHash.toLowerCase()&&e.modelYear===modelDecisionYear);
+      if(!ev){
+        // A successful receipt without a recognized event must NOT be submitted twice.
+        throw Error('Sepolia confirmed the transaction but its BondIssued event was not in the receipt. Do NOT issue again. Check Etherscan for '+txHash);
+      }
+      if(Math.abs(ev.principalM-Number(amountMillions))>1e-6)throw Error('Confirmed event amount does not match the submitted amount. Transaction '+txHash);
+      mergeEvents([ev]);
+      c.supplyM=usdMFromRaw(await callUint(c.address,SELECTOR.totalSupply));
+      setStatus(`ERC-20 mint confirmed: $${ev.principalM.toLocaleString('en-US')}M. Simulated funding activates ${window.SimulatorCore.addCalendarMonthISO(modelDecisionDate)}. Verify the transaction on Sepolia Etherscan.`, 'success');
+      return ev;
+    }catch(e){setStatus(explainError(e),'error');throw e;}
+    finally{state.busy=false;updateUI();}
+  }
+
+  $('singleConnect').addEventListener('click',()=>{void connect();});
+  $('singleSwitch').addEventListener('click',()=>{void switchSepolia();});
+  $('singleLoad').addEventListener('click',()=>{void loadBond($('singleContractInput').value);});
+  $('singleContractInput').value=savedAddress();
+  window.SingleBondWallet={issueBond,explainError,connect,loadBond,switchSepolia,refreshUI:updateUI,
+    getState:()=>({account:state.account,chainId:state.chainId,contract:state.contract,events:state.events.map(e=>({...e})),busy:state.busy})};
+  updateUI();
+  // Restore connected wallet state without triggering an authorization popup.
+  void (async()=>{
+    const p=await discoverProvider();
+    if(!p)return;
+    state.provider=p;bindProvider(p);
+    await syncWallet();
+    const saved=savedAddress();
+    if(saved&&state.account&&String(state.chainId).toLowerCase()===CHAIN_ID){
+      await loadBond(saved,{quiet:true});
+    }
+  })().catch(e=>setStatus('Auto restore: '+explainError(e),'warning'));
 })();
 
 </script>
